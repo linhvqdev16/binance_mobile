@@ -44,6 +44,10 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   web_socket_channel: ^3.0.2
   flutter_riverpod: ^2.6.1
+  flutter_svg: ^2.0.17
+  decimal: ^3.0.2
+  equatable: ^2.0.7
+  dartz: ^0.10.1
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +76,12 @@ flutter:
   assets:
      - .env
      - assets/images/
+     - assets/icons/
+     - assets/fonts/IBMPFonts/
+  fonts:
+     - family: IBMPFonts
+       fonts:
+         - asset: assets/fonts/IBMPFonts/Binance PLEX.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

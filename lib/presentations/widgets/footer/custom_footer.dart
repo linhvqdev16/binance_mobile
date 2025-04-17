@@ -31,7 +31,7 @@ class _CustomFooterState extends State<CustomFooter> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) =>  HomePage()),
       );
     } else if (index == 1) {
       // Navigator.pushReplacement(

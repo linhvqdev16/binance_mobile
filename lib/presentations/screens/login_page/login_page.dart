@@ -143,7 +143,7 @@ class LoginScreenState extends State<LoginScreen> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  MaterialPageRoute(builder: (context) =>  HomePage()),
                 );
               },
               child: Text(appLocalizations.next,
