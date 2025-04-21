@@ -1,57 +1,128 @@
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/presentations/screens/home_page/crypto_list_widget.dart';
+import 'package:binance_mobile/presentations/screens/market_page/market_page.dart';
 import 'package:binance_mobile/presentations/widgets/error/error_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends ConsumerWidget {
+final selectedIndexProvider = StateProvider<int>((ref) => 0);
 
+class MainPage extends ConsumerWidget {
+  const MainPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedIndex = ref.watch(selectedIndexProvider);
+    final List<Widget> _screens = [
+      HomePage(),
+      MarketPage(),
+    ];
+
+    return Scaffold(
+      body: _screens[selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: selectedIndex,
+        onTap: (index) {
+          ref.read(selectedIndexProvider.notifier).state = index;
+        },
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey.withOpacity(0.5),
+        selectedLabelStyle: const TextStyle(fontSize: 12, color: Colors.black),
+        unselectedLabelStyle: const TextStyle(fontSize: 12),
+        items: [
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/house.png',
+              width: 25,
+              height: 25,
+            ),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/statistics.png',
+              width: 25,
+              height: 25,
+            ),
+            label: 'Markets',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/trade.png',
+              width: 25,
+              height: 25,
+            ),
+            label: 'Trade',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/future.png',
+              width: 25,
+              height: 25,
+            ),
+            label: 'Futures',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/wallet.png',
+              width: 25,
+              height: 25,
+            ),
+            label: 'Wallets',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class HomePage extends ConsumerWidget {
   HomePage({super.key});
 
   final selectedIndexProvider = StateProvider<int>((ref) => 0);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ignore: unused_local_variable
     final appLocalizations = AppLocalizations.of(context)!;
 
+    // ignore: unused_local_variable
     final selectedIndex = ref.watch(selectedIndexProvider);
 
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: [
-              _buildHeader(screenSize),
-              _buildBalanceSection(screenSize),
-              _buildQuickActions(screenSize),
-              _buildMarketTabs(screenSize, ref),
-              _buildMarketFilters(screenSize),
-              _buildHeaderCryptoItem(screenSize),
-              _buildMarketList(screenSize, ref),
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                      child: const Text(
-                        'View More',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFFFF8F00),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+    final screenSize = MediaQuery.of(context).size;
+    return SafeArea(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            _buildHeader(screenSize),
+            _buildBalanceSection(screenSize),
+            _buildQuickActions(screenSize),
+            _buildMarketTabs(screenSize, ref),
+            _buildMarketFilters(screenSize),
+            _buildHeaderCryptoItem(screenSize),
+            _buildMarketList(screenSize, ref),
+            Center(
+              child: Padding(
+                padding:
+                    EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                child: const Text(
+                  'View More',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFFF8F00),
+                    fontWeight: FontWeight.w500,
                   ),
-                  _buildDiscoveryTabs(screenSize),
-            ],
-          ),
+                ),
+              ),
+            ),
+            _buildDiscoveryTabs(screenSize),
+          ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -242,11 +313,10 @@ class HomePage extends ConsumerWidget {
         Container(
           padding: EdgeInsets.all(screenSize.width * 0.025),
           decoration: BoxDecoration(
-            // shape: BoxShape.circle,
-              border: Border.all(
-                  color: Colors.grey.withOpacity(0.15), width: 1),
-              borderRadius: BorderRadius.all(Radius.circular(12))
-          ),
+              // shape: BoxShape.circle,
+              border:
+                  Border.all(color: Colors.grey.withOpacity(0.15), width: 1),
+              borderRadius: BorderRadius.all(Radius.circular(12))),
           child: Icon(icon, size: 20, color: Colors.grey[700]),
         ),
         SizedBox(height: screenSize.height * 0.006),
@@ -285,18 +355,21 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTab(String text, {bool isSelected = false, int index = 0, WidgetRef? ref}) {
+  Widget _buildTab(String text,
+      {bool isSelected = false, int index = 0, WidgetRef? ref}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: GestureDetector(
-        onTap: () => { ref?.read(selectedIndexProvider.notifier).state = index},
+        onTap: () => {ref?.read(selectedIndexProvider.notifier).state = index},
         child: Column(
           children: [
             Text(
               text,
               style: TextStyle(
                 fontSize: 14,
-                color:  ref?.watch(selectedIndexProvider) == index ? Colors.black : Colors.grey[500],
+                color: ref?.watch(selectedIndexProvider) == index
+                    ? Colors.black
+                    : Colors.grey[500],
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -304,7 +377,9 @@ class HomePage extends ConsumerWidget {
             Container(
               height: 2,
               width: 24,
-              color: ref?.watch(selectedIndexProvider) == index ? const Color(0xFFFFC107) : Colors.transparent,
+              color: ref?.watch(selectedIndexProvider) == index
+                  ? const Color(0xFFFFC107)
+                  : Colors.transparent,
             ),
           ],
         ),
@@ -317,8 +392,8 @@ class HomePage extends ConsumerWidget {
       padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.005),
       decoration: const BoxDecoration(
         border: Border(
-          // bottom: BorderSide(color: Colors.grey[200]!),
-        ),
+            // bottom: BorderSide(color: Colors.grey[200]!),
+            ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -347,8 +422,7 @@ class HomePage extends ConsumerWidget {
         style: TextStyle(
             fontSize: 12,
             color: isSelected ? Colors.black : Colors.grey[600],
-            fontWeight: FontWeight.bold
-        ),
+            fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -360,7 +434,8 @@ class HomePage extends ConsumerWidget {
     } else if (cryptoState.errorMessage != null) {
       return ErrorMessageWidget(message: cryptoState.errorMessage!);
     } else {
-      return CryptoListWidget(tickers: cryptoState.tickers, screenSize: screenSize);
+      return CryptoListWidget(
+          tickers: cryptoState.tickers, screenSize: screenSize);
     }
   }
 
@@ -440,15 +515,12 @@ class HomePage extends ConsumerWidget {
                     _buildDiscoveryTab('Hot'),
                   ],
                 ),
-              )
-          ),
+              )),
           Expanded(
               flex: 1,
               child: Container(
                   padding: const EdgeInsets.all(5),
-                  decoration: const BoxDecoration(
-                      color: Colors.transparent
-                  ),
+                  decoration: const BoxDecoration(color: Colors.transparent),
                   child: Icon(Icons.menu, size: 20, color: Colors.grey[700]))),
         ],
       ),
@@ -458,15 +530,13 @@ class HomePage extends ConsumerWidget {
   Widget _buildDiscoveryTab(String text, {bool isSelected = false}) {
     return Padding(
       padding: const EdgeInsets.only(right: 16),
-      child: Text(
-          text,
+      child: Text(text,
           style: TextStyle(
             fontSize: 16,
             color: isSelected ? Colors.black : Colors.grey[500],
             fontWeight: FontWeight.w600,
           ),
-          overflow: TextOverflow.ellipsis
-      ),
+          overflow: TextOverflow.ellipsis),
     );
   }
 
