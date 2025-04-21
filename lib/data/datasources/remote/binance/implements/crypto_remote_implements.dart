@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -26,9 +25,8 @@ class CryptoRemoteDataSourceImpl implements CryptoRemoteDataSource {
       }
 
       // Create the streams string for the WebSocket connection
-      final streams = symbols
-          .map((symbol) => '${symbol.toLowerCase()}@ticker')
-          .join('/');
+      final streams =
+          symbols.map((symbol) => '${symbol.toLowerCase()}@ticker').join('/');
 
       // Connect to Binance WebSocket
       final wsUrl = '${EnvLoad.BASE_WEB_SOCKET}/$streams';
@@ -38,7 +36,7 @@ class CryptoRemoteDataSourceImpl implements CryptoRemoteDataSource {
       final controller = StreamController<List<CryptoTickerModel>>();
 
       final subscription = channel.stream.listen(
-            (dynamic data) {
+        (dynamic data) {
           final jsonData = jsonDecode(data);
           final symbol = jsonData['s'] as String;
 

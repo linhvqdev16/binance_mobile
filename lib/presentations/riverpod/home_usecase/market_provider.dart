@@ -1,32 +1,33 @@
 import 'dart:async';
-import 'package:binance_mobile/data/models/response/price_ticker.dart';
-import 'package:binance_mobile/presentations/riverpod/home_usecase/price_ticker_provider.dart';
+import 'package:binance_mobile/data/models/response/get_market_tickers.dart';
+import 'package:binance_mobile/data/models/response/market_ticket.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CryptoState {
+class MarketTickerState {
   final bool isLoading;
-  final List<CryptoTicker> tickers;
+  final List<MarketTicker> tickers;
   final String? errorMessage;
 
-  CryptoState({
+  // Constructor
+  MarketTickerState({
     required this.isLoading,
     required this.tickers,
     this.errorMessage,
   });
 
   // Initial state
-  factory CryptoState.initial() => CryptoState(
+  factory MarketTickerState.initial() => MarketTickerState(
         isLoading: true,
         tickers: const [],
       );
 
   // Copy with method for immutability
-  CryptoState copyWith({
+  MarketTickerState copyWith({
     bool? isLoading,
-    List<CryptoTicker>? tickers,
+    List<MarketTicker>? tickers,
     String? errorMessage,
   }) {
-    return CryptoState(
+    return MarketTickerState(
       isLoading: isLoading ?? this.isLoading,
       tickers: tickers ?? this.tickers,
       errorMessage: errorMessage,
@@ -35,21 +36,32 @@ class CryptoState {
 }
 
 // Notifier class
-class CryptoNotifier extends StateNotifier<CryptoState> {
-  final GetCryptoStreamUseCase getCryptoStreamUseCase;
+class MarketTickerNotifier extends StateNotifier<MarketTickerState> {
+  final GetMarketTickersUseCase getMarketTickersUseCase;
   StreamSubscription? _subscription;
 
-  CryptoNotifier({required this.getCryptoStreamUseCase})
-      : super(CryptoState.initial()) {
-    // Start fetching cryptocurrency data when created
-    fetchCryptoData();
+  MarketTickerNotifier({required this.getMarketTickersUseCase})
+      : super(MarketTickerState.initial()) {
+    // Start fetching market data when created
+    getMarketTickers();
   }
 
-  Future<void> fetchCryptoData() async {
+  Future<void> getMarketTickers() async {
     state = state.copyWith(isLoading: true);
-    final symbols = ['SOLUSDT', 'OMUSDT', 'BTCUSDT', 'BNBUSDT', 'ETHUSDT'];
+    final symbols = [
+      'BTCUSDT',
+      'ETHUSDT',
+      'BNBUSDT',
+      'SOLUSDT',
+      'AVAXUSDT',
+      'ADAUSDT',
+      'DOGEUSDT',
+      'XRPUSDT',
+      'DOTUSDT',
+      'LINKUSDT'
+    ];
 
-    final stream = getCryptoStreamUseCase.execute(symbols);
+    final stream = getMarketTickersUseCase.execute(symbols);
 
     _subscription = stream.listen(
       (result) {
@@ -57,7 +69,7 @@ class CryptoNotifier extends StateNotifier<CryptoState> {
           (failure) {
             state = state.copyWith(
               isLoading: false,
-              errorMessage: 'Failed to fetch cryptocurrency data',
+              errorMessage: null,
             );
           },
           (tickers) {
@@ -66,13 +78,14 @@ class CryptoNotifier extends StateNotifier<CryptoState> {
               tickers: tickers,
               errorMessage: null,
             );
+            print('Received tickers: $tickers');
           },
         );
       },
       onError: (error) {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'An error occurred: $error',
+          errorMessage: error.toString(),
         );
       },
     );

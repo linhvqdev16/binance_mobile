@@ -1,5 +1,7 @@
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/presentations/screens/home_page/crypto_list_widget.dart';
+import 'package:binance_mobile/presentations/screens/market_page/market_demo.dart';
+import 'package:binance_mobile/presentations/screens/market_page/market_demo2.dart';
 import 'package:binance_mobile/presentations/screens/market_page/market_page.dart';
 import 'package:binance_mobile/presentations/widgets/error/error_widget.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,8 @@ class MainPage extends ConsumerWidget {
     final List<Widget> _screens = [
       HomePage(),
       MarketPage(),
+      BinanceTracker(),
+      BinanceChart()
     ];
 
     return Scaffold(

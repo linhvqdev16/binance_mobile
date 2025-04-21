@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
         Locale('vi'),
         Locale('en'),
       ],
-      home: MainPage(),
+      home: const MainPage(),
     );
   }
 }

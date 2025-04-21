@@ -24,8 +24,8 @@ class CryptoItemWidget extends StatelessWidget {
 
     // Determine color based on percent change
     final Color changeColor = ticker.percentChange >= 0
-        ? Color(0xFF2EBD85).withOpacity(0.1)
-        : Color(0xFFF6455F).withOpacity(0.1);
+        ? const Color(0xFF2EBD85).withOpacity(0.1)
+        : const Color(0xFFF6455F).withOpacity(0.1);
     final String changeSign = ticker.percentChange >= 0 ? '+' : '';
 
     return Container(
