@@ -1,871 +1,535 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'dart:math';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MarketPage extends StatefulWidget {
-  const MarketPage({super.key});
+class PriceTracker extends ConsumerStatefulWidget {
+  PriceTracker({super.key});
 
   @override
-  State<MarketPage> createState() => _MarketPageState();
+  ConsumerState<PriceTracker> createState() => _PriceTrackerState();
 }
 
-class _MarketPageState extends State<MarketPage> {
-  //Biêur đồ barChart
-  final int totalBars = 60;
-  final Random random = Random();
-  late List<double> barData;
-  late List<bool> isIncrease;
-  late List<double> purpleLine;
-  late List<double> orangeLine;
+class _PriceTrackerState extends ConsumerState<PriceTracker>
+    with SingleTickerProviderStateMixin {
+  final WebSocketChannel _channel = WebSocketChannel.connect(
+    Uri.parse('wss://stream.binance.com:9443/ws/!ticker@arr'),
+  );
+
+  final List<String> _watchlist = [
+    'BNBUSDT',
+    'BTCUSDT',
+    'ETHUSDT',
+    'SOLUSDT',
+    'XRPUSDT',
+    'REDUSDT',
+    'ADAUSDT',
+    'PEPEUSDT'
+  ];
+
+  final Map<String, dynamic> _tickerData = {};
+  final Map<String, double> _prevPrices = {};
+  final Map<String, double> _percentChanges = {};
+  final Map<String, double> _volumes = {};
+  final Map<String, int> _leverages = {
+    'BNBUSDT': 10,
+    'BTCUSDT': 10,
+    'ETHUSDT': 10,
+    'SOLUSDT': 5,
+    'XRPUSDT': 10,
+    'REDUSDT': 5,
+    'ADAUSDT': 10,
+    'PEPEUSDT': 5
+  };
+  bool _isLoading = true;
+
+  late AnimationController _animationController;
+
   @override
   void initState() {
     super.initState();
 
-    // Dữ liệu cột
-    barData = List.generate(
-      totalBars,
-      (i) => 0.1 + random.nextDouble() * 1,
-    );
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat();
 
-    // Tăng giảm xen kẽ
-    isIncrease = List.generate(totalBars, (i) => i % 2 == 0);
-
-    // Đường tím: lấy trung bình cộng quanh cột
-    purpleLine = [];
-    for (int i = 0; i < totalBars; i++) {
-      double avg = 0;
-      int count = 0;
-      for (int j = i - 2; j <= i + 2; j++) {
-        if (j >= 0 && j < totalBars) {
-          avg += barData[j];
-          count++;
+    _channel.stream.listen((message) {
+      final decodedMessage = jsonDecode(message);
+      setState(() {
+        if (_isLoading) {
+          _isLoading = false;
         }
-      }
-      purpleLine.add(avg / count);
-    }
 
-    // Đường cam: dao động nhẹ dựa trên đường tím
-    orangeLine = List.generate(
-      totalBars,
-      (i) => purpleLine[i] + (random.nextDouble() - 0.5) * 0.2,
-    );
+        for (var ticker in decodedMessage) {
+          final symbol = ticker['s'];
+          if (_watchlist.contains(symbol)) {
+            final double closePrice = double.parse(ticker['c']);
+            final double openPrice = double.parse(ticker['o']);
+            final percentChange = ((closePrice - openPrice) / openPrice) * 100;
+            final double volume = double.parse(ticker['q']) / 1000000;
+
+            _tickerData[symbol] = closePrice;
+            _percentChanges[symbol] = percentChange;
+            _volumes[symbol] = volume;
+
+            if (!_prevPrices.containsKey(symbol)) {
+              _prevPrices[symbol] = closePrice;
+            }
+          }
+        }
+      });
+
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          setState(() {
+            for (var ticker in decodedMessage) {
+              final symbol = ticker['s'];
+              if (_watchlist.contains(symbol)) {
+                _prevPrices[symbol] = double.parse(ticker['c']);
+              }
+            }
+          });
+        }
+      });
+    });
   }
 
+  @override
+  void dispose() {
+    _channel.sink.close();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  Color _getChangeColor(double change) {
+    return change >= 0 ? const Color(0xFF25C26E) : const Color(0xFFF6465D);
+  }
+
+  final selectedIndexProvider = StateProvider<int>((ref) => 0);
+  @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double barWidth = screenWidth / totalBars;
+    final screenSize = MediaQuery.of(context).size;
+    int selectedTab = 0;
 
-    //Khai báo dữ liệu demo để hiện thị cho phần mua bán
-    final buyOrders = [
-      ['295,02', '18,11'],
-      ['3.094,22', '18,10'],
-      ['4.126,07', '18,09'],
-      ['7.688,40', '18,08'],
-    ];
-
-    final sellOrders = [
-      ['18,12', '3.004,53'],
-      ['18,13', '8.378,03'],
-      ['18,14', '10.425,12'],
-      ['18,15', '5.686,63'],
-    ];
-    //mặc định chọn nút Sổ lệnh
-    String selected = 'Sổ lệnh';
-    String selectedValue = '0.1';
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15),
-            child: Column(
-              children: [
-                //Thông tin - dòng 1
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '18,10',
-                        style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 125,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Giá cao nhất 24h',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  '18,91',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: 93,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'KL 24h(AVAX)',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  '4,44M',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                //Thông tin - dòng 2
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          RichText(
-                            text: const TextSpan(
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: '18,1 \$ ',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                                TextSpan(
-                                  text: '+8,58%',
-                                  style: TextStyle(color: Colors.green),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Text(
-                            'Lớp 1 / Lớp 2',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange),
-                          ),
-                        ],
-                      ),
-                      const Row(
-                        children: [
-                          SizedBox(
-                            width: 125,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Giá thấp nhất 24h',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  '15,96',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: 93,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'KL 24h(USDT)',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  '4,44M',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                //Thời gian giao dịch
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 15),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Thời gian',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        const Text(
-                          '1h',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        const Text(
-                          '4h',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        const Text(
-                          '15p',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        const Text(
-                          '1 ngày',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        const Row(
-                          children: [
-                            Text(
-                              'Nhiều hơn',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Icon(Icons.arrow_drop_down)
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        const Text(
-                          'Độ sâu',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        IconButton(
-                            onPressed: () => {},
-                            icon: const Icon(Icons.menu_open))
-                      ],
-                    ),
-                  ),
-                ),
-                //Biểu đồ lên xuống
-                SizedBox(
-                  height: screenHeight / 3,
-                  child: LineChart(
-                    LineChartData(
-                      minX: 0,
-                      maxX: 10,
-                      minY: 18.00,
-                      maxY: 18.24,
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: false,
-                        getDrawingHorizontalLine: (value) => FlLine(
-                          color: Colors.grey.withOpacity(0.2),
-                          strokeWidth: 1,
-                        ),
-                      ),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        bottomTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        leftTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 40,
-                            getTitlesWidget: (value, _) {
-                              return Text(
-                                value.toStringAsFixed(2),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              );
-                            },
-                            interval: 0.04,
-                          ),
-                        ),
-                        topTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                      ),
-                      borderData: FlBorderData(show: false),
-                      lineBarsData: [
-                        // Đường chính màu vàng
-                        LineChartBarData(
-                          spots: const [
-                            FlSpot(0, 18.10),
-                            FlSpot(1, 18.22),
-                            FlSpot(2, 18.04),
-                            FlSpot(3, 18.18),
-                            FlSpot(4, 18.02),
-                            FlSpot(5, 18.14),
-                            FlSpot(6, 18.03),
-                            FlSpot(7, 18.20),
-                            FlSpot(8, 18.08),
-                            FlSpot(9, 18.19),
-                            FlSpot(10, 18.11),
-                          ],
-                          isCurved: true,
-                          color: Colors.orange,
-                          barWidth: 2,
-                          isStrokeCapRound: true,
-                          belowBarData: BarAreaData(
-                            show: true,
-                            color: Colors.orange.withOpacity(0.2),
-                          ),
-                          dotData: const FlDotData(show: false),
-                        ),
-                        // Đường MA60 màu xám
-                        LineChartBarData(
-                          spots: const [
-                            FlSpot(0, 18.12),
-                            FlSpot(1, 18.14),
-                            FlSpot(2, 18.13),
-                            FlSpot(3, 18.15),
-                            FlSpot(4, 18.16),
-                            FlSpot(5, 18.17),
-                            FlSpot(6, 18.16),
-                            FlSpot(7, 18.15),
-                            FlSpot(8, 18.14),
-                            FlSpot(9, 18.13),
-                            FlSpot(10, 18.12),
-                          ],
-                          isCurved: true,
-                          color: Colors.grey.shade600,
-                          barWidth: 2,
-                          dotData: const FlDotData(show: false),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                //Vol and Ma
-                const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    Text(
-                      'Vol: 413,14',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'MA (5): 602,14',
-                      style: TextStyle(fontSize: 14, color: Colors.orange),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'MA (10): 824,98',
-                      style: TextStyle(fontSize: 14, color: Colors.purple),
-                    ),
-                  ],
-                ),
-                //Biểu đồ: BarChart
-                SizedBox(
-                  // aspectRatio: 1,
-                  height: 80,
-                  child: Stack(
-                    children: [
-                      BarChart(
-                        BarChartData(
-                          alignment: BarChartAlignment.spaceEvenly,
-                          maxY: 1.5,
-                          barGroups: List.generate(totalBars, (i) {
-                            return BarChartGroupData(
-                              x: i,
-                              barsSpace: 0,
-                              barRods: [
-                                BarChartRodData(
-                                  toY: barData[i],
-                                  width: barWidth,
-                                  color:
-                                      isIncrease[i] ? Colors.green : Colors.red,
-                                  borderRadius: BorderRadius.circular(0),
-                                ),
-                              ],
-                            );
-                          }),
-                          titlesData: const FlTitlesData(show: false),
-                          gridData: const FlGridData(show: false),
-                          borderData: FlBorderData(show: false),
-                          barTouchData: BarTouchData(enabled: false),
-                        ),
-                      ),
-                      LineChart(
-                        LineChartData(
-                          minY: 0,
-                          maxY: 2,
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: List.generate(
-                                totalBars,
-                                (i) => FlSpot(i.toDouble(), purpleLine[i]),
-                              ),
-                              isCurved: true,
-                              color: Colors.purpleAccent,
-                              barWidth: 2,
-                              dotData: const FlDotData(show: false),
-                            ),
-                            LineChartBarData(
-                              spots: List.generate(
-                                totalBars,
-                                (i) => FlSpot(i.toDouble(), orangeLine[i]),
-                              ),
-                              isCurved: true,
-                              color: Colors.orangeAccent,
-                              barWidth: 2,
-                              dotData: const FlDotData(show: false),
-                            ),
-                          ],
-                          titlesData: const FlTitlesData(show: false),
-                          gridData: const FlGridData(show: false),
-                          borderData: FlBorderData(show: false),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                //Ngày - tháng - năm - giờ
-                const SizedBox(
-                  height: 5,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      '2025-04-10 14:43',
-                      style: TextStyle(
-                          color: Colors.grey, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '2025-04-10 14:43',
-                      style: TextStyle(
-                          color: Colors.grey, fontWeight: FontWeight.w600),
-                    )
-                  ],
-                ),
-                //MA - EMA -BOLL
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: Colors.grey, width: 0.5),
-                      bottom: BorderSide(color: Colors.grey, width: 0.5),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'MA',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
-                            )),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'EMA',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'BOLL',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'SAR',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'AVL',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                        const Text('|',
-                            style: TextStyle(fontSize: 25, color: Colors.grey)),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'VOL',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
-                            )),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'MACD',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'RSI',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                        TextButton(
-                            onPressed: () => {},
-                            child: const Text(
-                              'KDJ',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
-                //Hôm nay, 7 ngày, 30 ngày
-                const SizedBox(
-                  height: 10,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Hôm nay',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.grey)),
-                        Text('4,26%',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.green))
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('7 ngày',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.grey)),
-                        Text('-8,31%',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.red))
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('30 ngày',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.grey)),
-                        Text('3,96%',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.green))
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('90 ngày',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.grey)),
-                        Text('-51,25%',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.red))
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('180 ngày',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.grey)),
-                        Text('-31.40%',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.red))
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('1 năm',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.grey)),
-                        Text('-61,55%',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Colors.red))
-                      ],
-                    )
-                  ],
-                ),
-                const Divider(color: Colors.grey, thickness: 0.5),
-                Container(
-                  padding: const EdgeInsets.only(top: 5, bottom: 10),
-                  child: const Row(
-                    children: [
-                      Text(
-                        'Sổ lệnh',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Text(
-                        'Giao dịch',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.orange),
-                      )
-                    ],
-                  ),
-                ),
-                // Tỉ lệ %
-                Row(
-                  children: [
-                    const Text(
-                      '44,69%',
-                      style: TextStyle(color: Colors.green),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                      flex: 4469,
-                      child: Container(
-                        height: 6,
-                        color: Colors.green,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                      flex: 5531,
-                      child: Container(
-                        height: 6,
-                        color: Colors.red,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text(
-                      '55,31%',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ],
-                ),
-                // Headers
-                Row(
-                  children: [
-                    const Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Mua vào'),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Bán ra'),
-                              DropdownButton<String>(
-                                value: selectedValue,
-                                items:
-                                    ['0.1', '0.2', '0.3'].map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    setState(() {
-                                      selectedValue = newValue;
-                                    });
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ...buyOrders.map((order) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  order[0],
-                                  style: const TextStyle(color: Colors.black),
-                                ),
-                                Text(
-                                  order[1],
-                                  style: const TextStyle(color: Colors.green),
-                                ),
-                              ],
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ...sellOrders.map((sell) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  sell[0],
-                                  style: const TextStyle(color: Colors.red),
-                                ),
-                                Text(
-                                  sell[1],
-                                  style: const TextStyle(color: Colors.black),
-                                ),
-                              ],
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                //footer
-              ],
-            ),
-          ),
+    return SafeArea(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            _buildHeader(screenSize),
+            const SizedBox(height: 5),
+            _buildMarketTabs(screenSize),
+            const SizedBox(height: 5),
+            _buildFilterOptions(screenSize),
+            _buildFilterOptions2(screenSize),
+            _buildColumnHeaders(screenSize),
+            const SizedBox(height: 5),
+            _isLoading ? _buildLoadingWidget() : _buildCryptoList(screenSize),
+          ],
         ),
       ),
     );
+  }
+
+//header
+  Widget _buildHeader(Size screenSize) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenSize.width * 0.03,
+        vertical: screenSize.height * 0.01,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 28,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search, size: 18, color: Colors.grey[600]),
+                  const SizedBox(width: 3),
+                  Text(
+                    "Tìm kiếm Coin/Cặp giao dịch/Phái sinh",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: screenSize.width * 0.01),
+          Icon(Icons.more_horiz, size: 24, color: Colors.grey[600]),
+        ],
+      ),
+    );
+  }
+
+//loadding chờ dữ liệu
+  Widget _buildLoadingWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Sử dụng icon có sẵn của Binance
+          RotationTransition(
+            turns: _animationController,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF0B90B),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.currency_bitcoin,
+                size: 60,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Binance',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFF0B90B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+//Danh sách yêu thích + Thị trường + Alpha + Phát triển
+  Widget _buildMarketTabs(Size screenSize) {
+    return Container(
+      padding: EdgeInsets.only(top: screenSize.height * 0.015),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            SizedBox(width: screenSize.width * 0.04),
+            _buildTab('Danh sách yêu thích', index: 0, ref: ref),
+            _buildTab('Thị trường', index: 1, ref: ref),
+            _buildTab('Alpha', index: 2, ref: ref),
+            _buildTab('Phát triển', index: 3, ref: ref),
+            _buildTab('Square', index: 4, ref: ref),
+            _buildTab('Dữ liệu', index: 5, ref: ref),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTab(String text,
+      {bool isSelected = false, int index = 0, WidgetRef? ref}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: GestureDetector(
+        onTap: () => {ref?.read(selectedIndexProvider.notifier).state = index},
+        child: Column(
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 14,
+                color: ref?.watch(selectedIndexProvider) == index
+                    ? Colors.black
+                    : Colors.grey[500],
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              height: 2,
+              width: 24,
+              color: ref?.watch(selectedIndexProvider) == index
+                  ? const Color(0xFFFFC107)
+                  : Colors.transparent,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+//Tiền mã hóa + Giao ngay + USDM + COIN-M + Quyền chọn
+  Widget _buildFilterOptions(Size screenSize) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.005),
+        decoration: const BoxDecoration(
+          border: Border(
+              // bottom: BorderSide(color: Colors.grey[200]!),
+              ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(width: screenSize.width * 0.03),
+            _buildFilter('Tiền mã hóa', isSelected: true),
+            _buildFilter('Giao ngay'),
+            _buildFilter('USDM'),
+            _buildFilter('COIN-M'),
+            _buildFilter('Quyền chọn'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilter(String text, {bool isSelected = false}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 13,
+          color: isSelected ? Colors.black : Colors.grey[500],
+        ),
+      ),
+    );
+  }
+
+  //Tất cả + solana + RWA + Meme...
+  Widget _buildFilterOptions2(Size screenSize) {
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              padding:
+                  EdgeInsets.symmetric(vertical: screenSize.height * 0.005),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: screenSize.width * 0.03),
+                  _buildFilter2('Tất cả', isSelected: true),
+                  _buildFilter2('Solana'),
+                  _buildFilter2('RWA'),
+                  _buildFilter2('Meme'),
+                  _buildFilter2('Payments'),
+                  _buildFilter2('AI'),
+                  _buildFilter2('Lớp 1 / Lớp 2'),
+                  _buildFilter2('Metaverse'),
+                  _buildFilter2('Hạt giống'),
+                  _buildFilter2('Launchpool'),
+                  _buildFilter2('Megadrop'),
+                  _buildFilter2('Gaming'),
+                  _buildFilter2('DeFi'),
+                  _buildFilter2('Giám sát'),
+                  _buildFilter2('Liquid Staking'),
+                  _buildFilter2('Fan Token'),
+                  _buildFilter2('Cơ sở hạ tầng'),
+                  _buildFilter2('BNB chain'),
+                  _buildFilter2('Storage'),
+                  _buildFilter2('NFT'),
+                  _buildFilter2('Launchpad'),
+                  _buildFilter2('Polkadot'),
+                  _buildFilter2('POW'),
+                  _buildFilter2('Niêm yết mới'),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: screenSize.width * 0.02),
+        Icon(Icons.list, size: 25, color: Colors.grey[600]),
+        SizedBox(width: screenSize.width * 0.02),
+      ],
+    );
+  }
+
+  Widget _buildFilter2(String text, {bool isSelected = false}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.grey.withOpacity(0.05) : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 13,
+          color: isSelected ? Colors.black : Colors.grey[500],
+        ),
+      ),
+    );
+  }
+
+//Tên/KL + giá gần nhất + thay đổi 24h
+  Widget _buildColumnHeaders(Size screenSize) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              'Tên / KL',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              'Giá gần nhất',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              textAlign: TextAlign.right,
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              'Thay đổi 24h',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+//Dữ liệu
+  Widget _buildCryptoList(Size screenSize) {
+    return ListView.builder(
+      itemCount: _watchlist.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        final symbol = _watchlist[index];
+        final baseAsset = symbol.replaceAll('USDT', '');
+        final price = _tickerData[symbol] ?? 0.0;
+        final prevPrice = _prevPrices[symbol] ?? price;
+        final percentChange = _percentChanges[symbol] ?? 0.0;
+        final volume = _volumes[symbol] ?? 0.0;
+        final leverage = _leverages[symbol] ?? 1;
+
+        Color priceColor = price > prevPrice
+            ? const Color(0xFF25C26E)
+            : (price < prevPrice ? const Color(0xFFF6465D) : Colors.black);
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          baseAsset,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '/USDT ${leverage}x',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${volume.toStringAsFixed(2)}M',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    AnimatedDefaultTextStyle(
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: priceColor,
+                      ),
+                      duration: const Duration(milliseconds: 300),
+                      child: Text(
+                        _formatPrice(price),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatPrice(price),
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    width: 75,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 6, horizontal: 5),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: _getChangeColor(percentChange),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: Text(
+                      '${percentChange >= 0 ? "+" : ""}${percentChange.toStringAsFixed(2)}%',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatPrice(double price) {
+    if (price == 0) return '0';
+    if (price < 0.00001) return price.toStringAsFixed(8);
+    if (price < 0.001) return price.toStringAsFixed(6);
+    if (price < 1) return price.toStringAsFixed(4);
+    if (price < 10) return price.toStringAsFixed(3);
+    if (price < 1000) return price.toStringAsFixed(2);
+    return price.toStringAsFixed(2);
   }
 }
