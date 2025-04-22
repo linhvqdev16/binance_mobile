@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:binance_mobile/data/models/response/price_ticker.dart';
-import 'package:binance_mobile/presentations/riverpod/home_usecase/price_ticker_provider.dart';
+import 'package:binance_mobile/presentations/service/home_usecase/price_ticker_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CryptoState {
@@ -16,9 +16,9 @@ class CryptoState {
 
   // Initial state
   factory CryptoState.initial() => CryptoState(
-    isLoading: true,
-    tickers: const [],
-  );
+        isLoading: true,
+        tickers: const [],
+      );
 
   // Copy with method for immutability
   CryptoState copyWith({
@@ -39,7 +39,8 @@ class CryptoNotifier extends StateNotifier<CryptoState> {
   final GetCryptoStreamUseCase getCryptoStreamUseCase;
   StreamSubscription? _subscription;
 
-  CryptoNotifier({required this.getCryptoStreamUseCase}) : super(CryptoState.initial()) {
+  CryptoNotifier({required this.getCryptoStreamUseCase})
+      : super(CryptoState.initial()) {
     // Start fetching cryptocurrency data when created
     fetchCryptoData();
   }
@@ -51,15 +52,15 @@ class CryptoNotifier extends StateNotifier<CryptoState> {
     final stream = getCryptoStreamUseCase.execute(symbols);
 
     _subscription = stream.listen(
-          (result) {
+      (result) {
         result.fold(
-              (failure) {
+          (failure) {
             state = state.copyWith(
               isLoading: false,
               errorMessage: 'Failed to fetch cryptocurrency data',
             );
           },
-              (tickers) {
+          (tickers) {
             state = state.copyWith(
               isLoading: false,
               tickers: tickers,
@@ -76,6 +77,7 @@ class CryptoNotifier extends StateNotifier<CryptoState> {
       },
     );
   }
+
   @override
   void dispose() {
     _subscription?.cancel();

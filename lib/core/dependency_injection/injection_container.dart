@@ -2,8 +2,8 @@ import 'package:binance_mobile/data/datasources/remote/binance/implements/crypto
 import 'package:binance_mobile/data/datasources/remote/binance/interface/crypto_remote_interface.dart';
 import 'package:binance_mobile/data/repositories/implements/crypto_repository_impl.dart';
 import 'package:binance_mobile/data/repositories/interface/crypto_repository.dart';
-import 'package:binance_mobile/presentations/riverpod/home_usecase/crypto_notifier.dart';
-import 'package:binance_mobile/presentations/riverpod/home_usecase/price_ticker_provider.dart';
+import 'package:binance_mobile/presentations/service/home_usecase/crypto_notifier.dart';
+import 'package:binance_mobile/presentations/service/home_usecase/price_ticker_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final cryptoRemoteDataSourceProvider = Provider<CryptoRemoteDataSource>(

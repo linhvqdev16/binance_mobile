@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:binance_mobile/core/env/load_env.dart';
+import 'package:binance_mobile/core/utils/load_env.dart';
 import 'package:http/http.dart' as http;
 
 class HttpClient {

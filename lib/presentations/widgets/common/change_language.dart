@@ -26,11 +26,9 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       String? langCode = await SharedPreferencesLocal.getLanguageCode();
-      if (langCode != null) {
-        setState(() {
-          _currentLocale = Locale(langCode);
-        });
-      }
+      setState(() {
+        _currentLocale = Locale(langCode!);
+      });
     });
   }
 
@@ -65,7 +63,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
               curve: Curves.easeInOut,
               margin: const EdgeInsets.all(3),
               alignment:
-              isVietnamese ? Alignment.centerLeft : Alignment.centerRight,
+                  isVietnamese ? Alignment.centerLeft : Alignment.centerRight,
               child: Container(
                 height: 34,
                 width: 50,

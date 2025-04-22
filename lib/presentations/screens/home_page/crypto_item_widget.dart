@@ -1,3 +1,4 @@
+import 'package:binance_mobile/core/styles/colors.dart';
 import 'package:binance_mobile/data/models/response/price_ticker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,26 +7,24 @@ class CryptoItemWidget extends StatelessWidget {
   final CryptoTicker ticker;
   final Size screenSize;
 
-  const CryptoItemWidget({Key? key, required this.ticker, required this.screenSize}) : super(key: key);
+  const CryptoItemWidget(
+      {Key? key, required this.ticker, required this.screenSize})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     final formattedSymbol = ticker.symbol.replaceAll('USDT', '');
-
-    // Format price with NumberFormat for proper decimal places
     final priceFormatter = NumberFormat('#,##0.00', 'en_US');
     final priceDisplay = double.tryParse(ticker.price) != null
         ? double.parse(ticker.price) < 1
-        ? ticker.price
-        : priceFormatter.format(double.parse(ticker.price))
+            ? ticker.price
+            : priceFormatter.format(double.parse(ticker.price))
         : ticker.price;
-
-    // Determine color based on percent change
-    final Color changeColor = ticker.percentChange >= 0 ?  Color(0xFF2EBD85).withOpacity(0.1) :  Color(0xFFF6455F).withOpacity(0.1);
+    final Color changeColor = ticker.percentChange >= 0
+        ? ColorStyle.greenColor()
+        : ColorStyle.redColor();
     final String changeSign = ticker.percentChange >= 0 ? '+' : '';
-
-    return  Container(
+    return Container(
       padding: EdgeInsets.symmetric(
         horizontal: screenSize.width * 0.04,
         vertical: screenSize.height * 0.015,
@@ -37,7 +36,7 @@ class CryptoItemWidget extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  '${ticker.symbol}',
+                  ticker.symbol,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -60,14 +59,14 @@ class CryptoItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${priceDisplay}',
+                  priceDisplay,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  '${priceDisplay} \$',
+                  '$priceDisplay \$',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -103,5 +102,4 @@ class CryptoItemWidget extends StatelessWidget {
       ),
     );
   }
-
 }
