@@ -15,7 +15,7 @@ class _IndicatorTabsState extends State<IndicatorTabs> {
     final indicators = ["MA", "EMA", "BOLL", "SAR", "AVL", "VOL", "MACD", "RSI", "KDJ"];
 
     return SizedBox(
-      height: 40,
+      height: 20,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: indicators.length + 1, // +1 for the last icon
@@ -26,10 +26,8 @@ class _IndicatorTabsState extends State<IndicatorTabs> {
               onPressed: () {},
             );
           }
-
           final indicator = indicators[index];
           final isSelected = index == _selectedIndex;
-
           return InkWell(
             onTap: () {
               setState(() {
@@ -37,18 +35,13 @@ class _IndicatorTabsState extends State<IndicatorTabs> {
               });
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: isSelected
-                    ? const Border(bottom: BorderSide(color: Colors.amber, width: 2))
-                    : null,
-              ),
               child: Text(
                 indicator,
                 style: TextStyle(
                   color: isSelected ? Colors.black : Colors.grey,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
             ),

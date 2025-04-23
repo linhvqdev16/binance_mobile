@@ -11,7 +11,6 @@ class TradingChart extends ConsumerWidget {
     final candlesticks = ref.watch(candlesticksProvider);
     final marketData = ref.watch(marketDataProvider);
 
-    // Convert our CandlestickData to the format expected by the candlesticks package
     final candles = candlesticks.map((candle) => Candle(
       date: candle.time,
       open: candle.open,
@@ -34,18 +33,18 @@ class TradingChart extends ConsumerWidget {
             //   // In a real app, you would load more historical data here
             //   print('Load more candles requested');
             // },
-            actions: [
-              ToolBarAction(
-                width: 50,
-                onPressed: () {},
-                child: const Icon(Icons.access_time),
-              ),
-              ToolBarAction(
-                width: 50,
-                onPressed: () {},
-                child: const Icon(Icons.settings),
-              ),
-            ],
+            // actions: [
+            //   ToolBarAction(
+            //     width: 50,
+            //     onPressed: () {},
+            //     child: const Icon(Icons.access_time),
+            //   ),
+            //   ToolBarAction(
+            //     width: 50,
+            //     onPressed: () {},
+            //     child: const Icon(Icons.settings),
+            //   ),
+            // ],
           ),
         ),
       ],
