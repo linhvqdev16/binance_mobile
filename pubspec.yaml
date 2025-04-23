@@ -52,6 +52,8 @@ dependencies:
   freezed_annotation: ^3.0.0
   build_runner: ^2.4.6 
   candlesticks: ^2.1.0
+  deriv_chart: ^0.3.8
+  k_chart_plus: ^1.0.2
 
 dev_dependencies:
   flutter_test:

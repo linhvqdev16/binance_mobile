@@ -1,14 +1,9 @@
-// providers/websocket_provider.dart
-import 'dart:convert';
 import 'package:binance_mobile/data/models/models/candlestick_data_model.dart';
 import 'package:binance_mobile/data/models/models/market_data_model.dart';
 import 'package:binance_mobile/data/models/models/order_book_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-
 import '../../service/detail_page/websocket_service.dart';
 
-// State class to hold market data
 class WebSocketState {
   final MarketDataModel marketData;
   final List<CandlestickData> candlesticks;
@@ -36,12 +31,9 @@ class WebSocketState {
     );
   }
 }
-
-// Define the WebSocket notifier
 class WebSocketNotifier extends StateNotifier<WebSocketState> {
   WebSocketService? _webSocket;
   String? _currentSymbol;
-
   WebSocketNotifier() : super(WebSocketState(
     marketData: MarketDataModel(
       price: 0.0,
@@ -62,10 +54,8 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
 
   void connect(String symbol) {
     if (_webSocket != null && _currentSymbol == symbol && _webSocket!.isConnected) return;
-
     disconnect();
     _currentSymbol = symbol;
-
     _webSocket = WebSocketService(
       baseUrl: 'wss://stream.binance.com:9443/ws',
       onMessage: (data){
@@ -76,18 +66,13 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
         _subscribeToStreams(symbol);
       },
       onError: (error) {
-        print('WebSocket Error: $error');
         state = state.copyWith(isConnected: false);
       },
       onDisconnected: () {
-        print('WebSocket disconnected');
         state = state.copyWith(isConnected: false);
       },
     );
-
     _webSocket!.connect();
-
-    // Load initial mock data
     _loadMockData(symbol);
   }
 
@@ -100,15 +85,12 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
 
   void _subscribeToStreams(String symbol) {
     final String symbolLower = symbol.replaceAll('/', '').toLowerCase();
-
     _webSocket?.subscribe([
       "$symbolLower@trade",
-      "$symbolLower@depth20@100ms",
+      "$symbolLower@depth300@100ms",
       "$symbolLower@kline_1m",
     ]);
   }
-
-  // Reconnect to WebSocket
   void reconnect() {
     if (_currentSymbol != null) {
       Future.delayed(const Duration(seconds: 3), () {
@@ -116,13 +98,9 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       });
     }
   }
-
-  // Handle WebSocket messages
   void _handleWebSocketMessage(Map<String, dynamic> data) {
     if (data.containsKey('e')) {
       final eventType = data['e'];
-
-      // Handle different event types
       switch (eventType) {
         case 'trade':
           _handleTradeEvent(data);
@@ -136,21 +114,14 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       }
     }
   }
-
-  // Handle trade events
   void _handleTradeEvent(Map<String, dynamic> data) {
     final price = double.parse(data['p']);
-
-    // Update market data with new price
     final updatedMarketData = state.marketData.copyWith(
       price: price,
       lastUpdated: DateTime.now(),
     );
-
     state = state.copyWith(marketData: updatedMarketData);
   }
-
-  // Handle order book updates
   void _handleDepthUpdate(Map<String, dynamic> data) {
     final bids = data['b']?.map<OrderBookEntry>((bid) =>
         OrderBookEntry(
@@ -158,27 +129,21 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
             quantity: double.parse(bid[1])
         )
     )?.toList() ?? [];
-
     final asks = data['a']?.map<OrderBookEntry>((ask) =>
         OrderBookEntry(
             price: double.parse(ask[0]),
             quantity: double.parse(ask[1])
         )
     )?.toList() ?? [];
-
     final updatedOrderBook = state.orderBook.copyWith(
       bids: bids,
       asks: asks,
       lastUpdateId: data['lastUpdateId'] ?? state.orderBook.lastUpdateId,
     );
-
     state = state.copyWith(orderBook: updatedOrderBook);
   }
-
-  // Handle candlestick updates
   void _handleKlineUpdate(Map<String, dynamic> data) {
     final k = data['k'];
-
     final newCandle = CandlestickData(
       time: DateTime.fromMillisecondsSinceEpoch(k['t']),
       open: double.parse(k['o']),
@@ -187,32 +152,21 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       close: double.parse(k['c']),
       volume: double.parse(k['v']),
     );
-
-    // Find and update existing candle or add new one
     final updatedCandlesticks = List<CandlestickData>.from(state.candlesticks);
-
     final existingIndex = updatedCandlesticks.indexWhere(
             (candle) => candle.time.millisecondsSinceEpoch == newCandle.time.millisecondsSinceEpoch
     );
-
     if (existingIndex >= 0) {
       updatedCandlesticks[existingIndex] = newCandle;
     } else {
       updatedCandlesticks.add(newCandle);
-
-      // Sort by time
       updatedCandlesticks.sort((a, b) => a.time.compareTo(b.time));
-
-      // Limit the number of candles to keep
       if (updatedCandlesticks.length > 200) {
         updatedCandlesticks.removeAt(0);
       }
     }
-
     state = state.copyWith(candlesticks: updatedCandlesticks);
   }
-
-  // Load mock data for demonstration
   void _loadMockData(String symbol) {
     // Mock market data
     final marketData = MarketDataModel(
@@ -285,25 +239,18 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
     );
   }
 }
-
-// Provider for the WebSocket connection
 final websocketConnectionProvider = StateNotifierProvider<WebSocketNotifier, WebSocketState>((ref) {
   return WebSocketNotifier();
 });
-
-// Individual providers for specific parts of the state
 final marketDataProvider = Provider<MarketDataModel>((ref) {
   return ref.watch(websocketConnectionProvider).marketData;
 });
-
 final candlesticksProvider = Provider<List<CandlestickData>>((ref) {
   return ref.watch(websocketConnectionProvider).candlesticks;
 });
-
 final orderBookProvider = Provider<OrderBookData>((ref) {
   return ref.watch(websocketConnectionProvider).orderBook;
 });
-
 final connectionStatusProvider = Provider<bool>((ref) {
   return ref.watch(websocketConnectionProvider).isConnected;
 });

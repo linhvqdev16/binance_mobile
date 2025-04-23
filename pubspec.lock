@@ -206,6 +206,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  deriv_chart:
+    dependency: "direct main"
+    description:
+      name: deriv_chart
+      sha256: "4f36936fca3332b30d0f6f311cc466b58b6141ec4eccb800476a90c583b6356a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.8"
+  deriv_technical_analysis:
+    dependency: transitive
+    description:
+      name: deriv_technical_analysis
+      sha256: "9b4d5872d6239bb4800afa23d43029d2943729aa44b0a804c262e740e8e2c95d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   equatable:
     dependency: "direct main"
     description:
@@ -410,6 +426,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.9.5"
+  k_chart_plus:
+    dependency: "direct main"
+    description:
+      name: k_chart_plus
+      sha256: "06a56cce8689012798b8ccd57b5331c4bc8cc81859378857022eb23045fd85ef"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   leak_tracker:
     dependency: transitive
     description:
@@ -490,6 +514,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   package_config:
     dependency: transitive
     description:
@@ -570,6 +602,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  provider:
+    dependency: transitive
+    description:
+      name: provider
+      sha256: "489024f942069c2920c844ee18bb3d467c69e48955a4f32d1677f71be103e310"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.4"
   pub_semver:
     dependency: transitive
     description:

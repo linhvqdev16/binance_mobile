@@ -45,10 +45,7 @@ class TradingButtons extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(width: 8),
-
-          // Buy button
           Expanded(
             child: ElevatedButton(
               onPressed: () {},
@@ -63,10 +60,7 @@ class TradingButtons extends StatelessWidget {
               child: const Text('Mua', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ),
-
           const SizedBox(width: 8),
-
-          // Sell button
           Expanded(
             child: ElevatedButton(
               onPressed: () {},
