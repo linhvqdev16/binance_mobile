@@ -1,15 +1,15 @@
+import 'package:binance_mobile/presentations/riverpod/home_usecase/favoriteList_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:binance_mobile/presentations/riverpod/home_usecase/market_provider.dart';
 
-class MarketPage extends ConsumerStatefulWidget {
-  const MarketPage({super.key});
+class FavoritesList extends ConsumerStatefulWidget {
+  const FavoritesList({super.key});
 
   @override
-  ConsumerState<MarketPage> createState() => _MarketPageState();
+  ConsumerState<FavoritesList> createState() => _FavoritesListState();
 }
 
-class _MarketPageState extends ConsumerState<MarketPage>
+class _FavoritesListState extends ConsumerState<FavoritesList>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
@@ -36,8 +36,8 @@ class _MarketPageState extends ConsumerState<MarketPage>
   final selectedIndexProvider = StateProvider<int>((ref) => 0);
   @override
   Widget build(BuildContext context) {
-    final marketData = ref.watch(marketProvider);
     final screenSize = MediaQuery.of(context).size;
+    final favoriteData = ref.watch(favoriteListProvider);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -46,12 +46,11 @@ class _MarketPageState extends ConsumerState<MarketPage>
           children: [
             const SizedBox(height: 5),
             _buildFilterOptions(screenSize),
-            _buildFilterOptions2(screenSize),
             _buildColumnHeaders(screenSize),
             const SizedBox(height: 5),
-            marketData.isLoading
+            favoriteData.isLoading
                 ? _buildLoadingWidget()
-                : _buildCryptoList(screenSize, marketData),
+                : _buildCryptoList(screenSize, favoriteData),
           ],
         ),
       ),
@@ -96,47 +95,6 @@ class _MarketPageState extends ConsumerState<MarketPage>
 
 //Tiền mã hóa + Giao ngay + USDM + COIN-M + Quyền chọn
   Widget _buildFilterOptions(Size screenSize) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.005),
-        decoration: const BoxDecoration(
-          border: Border(
-              // bottom: BorderSide(color: Colors.grey[200]!),
-              ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(width: screenSize.width * 0.01),
-            _buildFilter('Tiền mã hóa', isSelected: true),
-            _buildFilter('Giao ngay'),
-            _buildFilter('USDM'),
-            _buildFilter('COIN-M'),
-            _buildFilter('Quyền chọn'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilter(String text, {bool isSelected = false}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 13,
-          color: isSelected ? Colors.black : Colors.grey[500],
-        ),
-      ),
-    );
-  }
-
-  //Tất cả + solana + RWA + Meme...
-  Widget _buildFilterOptions2(Size screenSize) {
     return Row(
       children: [
         Expanded(
@@ -147,53 +105,41 @@ class _MarketPageState extends ConsumerState<MarketPage>
                   EdgeInsets.symmetric(vertical: screenSize.height * 0.005),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(width: screenSize.width * 0.015),
-                  _buildFilter2('Tất cả', isSelected: true),
-                  _buildFilter2('Solana'),
-                  _buildFilter2('RWA'),
-                  _buildFilter2('Meme'),
-                  _buildFilter2('Payments'),
-                  _buildFilter2('AI'),
-                  _buildFilter2('Lớp 1 / Lớp 2'),
-                  _buildFilter2('Metaverse'),
-                  _buildFilter2('Hạt giống'),
-                  _buildFilter2('Launchpool'),
-                  _buildFilter2('Megadrop'),
-                  _buildFilter2('Gaming'),
-                  _buildFilter2('DeFi'),
-                  _buildFilter2('Giám sát'),
-                  _buildFilter2('Liquid Staking'),
-                  _buildFilter2('Fan Token'),
-                  _buildFilter2('Cơ sở hạ tầng'),
-                  _buildFilter2('BNB chain'),
-                  _buildFilter2('Storage'),
-                  _buildFilter2('NFT'),
-                  _buildFilter2('Launchpad'),
-                  _buildFilter2('Polkadot'),
-                  _buildFilter2('POW'),
-                  _buildFilter2('Niêm yết mới'),
+                  SizedBox(width: screenSize.width * 0.01),
+                  _buildFilter('Tất cả', isSelected: true),
+                  _buildFilter('Tài sản'),
+                  _buildFilter('Giao ngay'),
+                  _buildFilter('Futures'),
+                  _buildFilter('Quyền chọn'),
                 ],
               ),
             ),
           ),
         ),
-        SizedBox(width: screenSize.width * 0.01),
-        Icon(Icons.list, size: 25, color: Colors.grey[600]),
+        SizedBox(width: screenSize.width * 0.02),
+        Image.asset(
+          'assets/icons/4blacksquares.png',
+          width: 15,
+          height: 15,
+          color: Colors.grey[600],
+        ),
+        SizedBox(width: screenSize.width * 0.04),
+        Image.asset(
+          'assets/icons/pen.png',
+          width: 15,
+          height: 15,
+          color: Colors.grey[600],
+        ),
         SizedBox(width: screenSize.width * 0.02),
       ],
     );
   }
 
-  Widget _buildFilter2(String text, {bool isSelected = false}) {
+  Widget _buildFilter(String text, {bool isSelected = false}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.grey.withOpacity(0.05) : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-      ),
       child: Text(
         text,
         style: TextStyle(
@@ -273,8 +219,8 @@ class _MarketPageState extends ConsumerState<MarketPage>
   }
 
 //Dữ liệu
-  Widget _buildCryptoList(Size screenSize, MarketData marketData) {
-    final marketNotifier = ref.read(marketProvider.notifier);
+  Widget _buildCryptoList(Size screenSize, FavoriteList favoriteData) {
+    final marketNotifier = ref.read(favoriteListProvider.notifier);
     return ListView.builder(
       itemCount: marketNotifier.watchlist.length,
       shrinkWrap: true,
@@ -282,9 +228,11 @@ class _MarketPageState extends ConsumerState<MarketPage>
       itemBuilder: (context, index) {
         final symbol = marketNotifier.watchlist[index];
         final baseAsset = symbol.replaceAll('USDT', '');
-        final price = marketData.tickerData[symbol] ?? 0.0;
-        final prevPrice = marketData.prevPrices[symbol] ?? price;
-        final percentChange = marketData.percentChanges[symbol] ?? 0.0;
+        final price = favoriteData.tickerData[symbol] ?? 0.0;
+        final prevPrice = favoriteData.prevPrices[symbol] ?? price;
+        final percentChange = favoriteData.percentChanges[symbol] ?? 0.0;
+        final volume = favoriteData.volumes[symbol] ?? 0.0;
+        final leverage = marketNotifier.leverages[symbol] ?? 1;
 
         Color priceColor = price > prevPrice
             ? const Color(0xFF25C26E)
@@ -300,12 +248,37 @@ class _MarketPageState extends ConsumerState<MarketPage>
             children: [
               Expanded(
                 flex: 2,
-                child: Text(
-                  baseAsset,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          baseAsset,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '/USDT ${leverage}x',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${volume.toStringAsFixed(2)}M',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
@@ -335,7 +308,7 @@ class _MarketPageState extends ConsumerState<MarketPage>
                   ],
                 ),
               ),
-              SizedBox(width: screenSize.width * 0.02),
+              SizedBox(width: screenSize.width * 0.03),
               Expanded(
                 flex: 1,
                 child: Align(

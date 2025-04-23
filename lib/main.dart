@@ -1,5 +1,5 @@
 import 'package:binance_mobile/data/datasources/local/shared_preferences.dart';
-import 'package:binance_mobile/presentations/screens/login_page/login_page.dart';
+// import 'package:binance_mobile/presentations/screens/login_page/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -35,6 +35,7 @@ class MyApp extends StatefulWidget {
 
   static void setLocale(BuildContext context, Locale newLocale) async {
     _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    // ignore: unused_local_variable
     var prefs = await SharedPreferences.getInstance();
     SharedPreferencesLocal.setLanguageCode(newLocale.languageCode);
     state?.setLocale(newLocale);

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 
-class MarketPage extends StatefulWidget {
-  const MarketPage({super.key});
+class MarketPageChart extends StatefulWidget {
+  const MarketPageChart({super.key});
 
   @override
-  State<MarketPage> createState() => _MarketPageState();
+  State<MarketPageChart> createState() => _MarketPageChartState();
 }
 
-class _MarketPageState extends State<MarketPage> {
+class _MarketPageChartState extends State<MarketPageChart> {
   //Biêur đồ barChart
   final int totalBars = 60;
   final Random random = Random();
