@@ -21,8 +21,8 @@ class CryptoItemWidget extends StatelessWidget {
             : priceFormatter.format(double.parse(ticker.price))
         : ticker.price;
     final Color changeColor = ticker.percentChange >= 0
-        ? ColorStyle.greenColor()
-        : ColorStyle.redColor();
+        ? ColorStyle.greenColor
+        : ColorStyle.redColor;
     final String changeSign = ticker.percentChange >= 0 ? '+' : '';
     return Container(
       padding: EdgeInsets.symmetric(

@@ -1,9 +1,11 @@
+import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/core/styles/colors.dart';
 import 'package:binance_mobile/data/models/models/market_data_model.dart';
 import 'package:binance_mobile/presentations/provider/detail_page_provider/websocket_provider.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/coin_price_header.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/indicator_tabs.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/order_book.dart';
+import 'package:binance_mobile/presentations/screens/detail_page/time_view_selected.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/trading_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,15 +40,12 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
   @override
   void dispose() {
     _tabController.dispose();
-    // Disconnect from WebSocket when the screen is disposed
     ref.read(websocketConnectionProvider.notifier).disconnect();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final marketData = ref.watch(marketDataProvider);
-
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -56,23 +55,17 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
             CoinPriceHeader(symbol: widget.symbol),
             Align(
               alignment: Alignment.centerLeft,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                          color: Colors.grey.withOpacity(0.1), width: 0.1)),
-                ),
+              child: Container(decoration: BoxDecoration(border: Border( bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 0.1))),
                 width: MediaQuery.of(context).size.width,
                 child: TabBar(
                   controller: _tabController,
-                  labelPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                   labelColor: Colors.black,
                   isScrollable: true, // add this property
-                  unselectedLabelColor: Color(0xff585861).withOpacity(0.4),
+                  unselectedLabelColor: const Color(0xff585861).withOpacity(0.4),
                   indicatorColor: Colors.amber,
                   indicatorSize: TabBarIndicatorSize.label,
-                  labelStyle: TextStyle(fontWeight: FontWeight.w500),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
                   tabs: const [
                     Tab(text: 'Giá'),
                     Tab(text: 'Thông tin'),
@@ -82,23 +75,14 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
                 ),
               ),
             ),
-
-            // Tab content
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // Price tab content
-                  buildPriceTab(marketData),
-
-                  // Info tab - placeholder
-                  const Center(child: Text('Thông tin về coin')),
-
-                  // Trading data tab - placeholder
-                  const Center(child: Text('Dữ liệu giao dịch')),
-
-                  // Square tab - placeholder
-                  const Center(child: Text('Square')),
+                  buildPriceTab(),
+                  const Text('Thông tin về coin'),
+                  const Text('Dữ liệu giao dịch'),
+                  const Text('Square'),
                 ],
               ),
             ),
@@ -108,7 +92,8 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
     );
   }
 
-  Widget buildPriceTab(MarketDataModel marketData) {
+  Widget buildPriceTab() {
+    final marketData = ref.watch(marketDataProvider);
     final priceText = numberFormat.format(marketData.price);
     final changeText = marketData.priceChangePercent.toStringAsFixed(2);
     final isPositive = marketData.priceChangePercent >= 0;
@@ -145,10 +130,10 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
                   ),
                   Text(
                     priceText,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: ColorStyle.greenColor(),
+                      color: ColorStyle.greenColor,
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -156,7 +141,7 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                        Text(
-                        '${priceText} \$',
+                        '$priceText \$',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -176,7 +161,7 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Giá đánh dấu ${priceText}',
+                    'Giá đánh dấu $priceText',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.normal,
@@ -264,71 +249,14 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
               ],
             ),
           ),
-          // Trading chart
+          const TimeViewSelected(),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.55,
-            child: BinanceCandleChart(),
+            child: TradingChart(),
           ),
-
-          // const IndicatorTabs(),
-          // const TimePeriodButtons(),
-
-          // Extra info from second screenshot
-          // Container(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          //   child: Column(
-          //     children: [
-          //       Row(
-          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //         children: [
-          //           Column(
-          //             crossAxisAlignment: CrossAxisAlignment.start,
-          //             children: [
-          //               const Text('Giá cao nhất 24h', style: TextStyle(fontSize: 12, color: Colors.grey)),
-          //               Text(numberFormat.format(marketData.high24h), style: const TextStyle(fontSize: 12)),
-          //             ],
-          //           ),
-          //           Column(
-          //             crossAxisAlignment: CrossAxisAlignment.start,
-          //             children: [
-          //               const Text('KL 24h(BTC)', style: TextStyle(fontSize: 12, color: Colors.grey)),
-          //               Text(marketData.volume24h.toStringAsFixed(2), style: const TextStyle(fontSize: 12)),
-          //             ],
-          //           ),
-          //         ],
-          //       ),
-          //       const SizedBox(height: 8),
-          //       Row(
-          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //         children: [
-          //           Column(
-          //             crossAxisAlignment: CrossAxisAlignment.start,
-          //             children: [
-          //               const Text('Giá thấp nhất 24h', style: TextStyle(fontSize: 12, color: Colors.grey)),
-          //               Text(numberFormat.format(marketData.low24h), style: const TextStyle(fontSize: 12)),
-          //             ],
-          //           ),
-          //           Column(
-          //             crossAxisAlignment: CrossAxisAlignment.start,
-          //             children: [
-          //               const Text('KL 24h(USDT)', style: TextStyle(fontSize: 12, color: Colors.grey)),
-          //               Text('1.32B', style: const TextStyle(fontSize: 12)),
-          //             ],
-          //           ),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          //
-          // // Order book
-          // Expanded(
-          //   flex: 2,
-          //   child: OrderBook(),
-          // ),
-          //
-          // // Trading buttons (Buy/Sell)
-          // const TradingButtons(),
+          const IndicatorTabs(),
+          const TimePeriodButtons(),
+          OrderBook(symbol: widget.symbol)
         ],
       ),
     );

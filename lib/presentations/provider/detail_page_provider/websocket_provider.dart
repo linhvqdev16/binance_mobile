@@ -2,21 +2,25 @@ import 'dart:convert';
 
 import 'package:binance_mobile/data/models/models/candlestick_data_model.dart';
 import 'package:binance_mobile/data/models/models/market_data_model.dart';
+import 'package:binance_mobile/data/models/models/market_percent_model.dart';
 import 'package:binance_mobile/data/models/models/order_book_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../service/detail_page/websocket_service.dart';
+import 'package:http/http.dart' as http;
 
 class WebSocketState {
   final MarketDataModel marketData;
   final List<CandlestickData> candlesticks;
   final OrderBookData orderBook;
   final bool isConnected;
+  final MarketPercentModel marketPercentModel;
 
   WebSocketState({
     required this.marketData,
     required this.candlesticks,
     required this.orderBook,
     this.isConnected = false,
+    required this.marketPercentModel,
   });
 
   WebSocketState copyWith({
@@ -24,15 +28,18 @@ class WebSocketState {
     List<CandlestickData>? candlesticks,
     OrderBookData? orderBook,
     bool? isConnected,
+    MarketPercentModel? marketPercentModel,
   }) {
     return WebSocketState(
       marketData: marketData ?? this.marketData,
       candlesticks: candlesticks ?? this.candlesticks,
       orderBook: orderBook ?? this.orderBook,
-      isConnected: isConnected ?? this.isConnected,
+      isConnected: isConnected ?? this.isConnected,marketPercentModel:  marketPercentModel ?? this.marketPercentModel
+
     );
   }
 }
+
 class WebSocketNotifier extends StateNotifier<WebSocketState> {
   WebSocketService? _webSocket;
   String? _currentSymbol;
@@ -46,6 +53,14 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       volume24h: 0.0,
       lastUpdated: DateTime.now(),
     ),
+    marketPercentModel: MarketPercentModel(
+      y1: 0.0,
+      h24: 0.0,
+      d180: 0.0,
+      d90: 0.0,
+      d30: 0.0,
+      d7: 0.0
+    ),
     candlesticks: [],
     orderBook: OrderBookData(
       bids: [],
@@ -54,7 +69,9 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
     ),
   ));
 
-  void connect(String symbol) {
+  void connect(String symbol) async {
+    await fetchInitialData(symbol);
+    await calculatePercentChanges(symbol);
     if (_webSocket != null && _currentSymbol == symbol && _webSocket!.isConnected) return;
     disconnect();
     _currentSymbol = symbol;
@@ -75,7 +92,6 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       },
     );
     _webSocket!.connect();
-    _loadMockData(symbol);
   }
 
   void disconnect() {
@@ -116,6 +132,75 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       }
     }
   }
+  Future<void> calculatePercentChanges(String symbol) async {
+    final String symbolLower = symbol.replaceAll('/', '').toUpperCase();
+    final response = await http.get( Uri.parse('https://api.binance.com/api/v3/klines?symbol=$symbolLower&interval=1d&limit=365'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch historical data');
+    }
+    final List<dynamic> klines = jsonDecode(response.body);
+    final Map<String, double> percentChanges = {
+      '24h': 0.0,
+      '7d': 0.0,
+      '30d': 0.0,
+      '90d': 0.0,
+      '180d': 0.0,
+      '1y': 0.0
+    };
+    final currentPrice = double.parse(klines.last[4]);
+    if (klines.length > 1) {
+      final price24h = double.parse(klines[klines.length - 2][4]);
+      percentChanges['24h'] = ((currentPrice - price24h) / price24h) * 100;
+    }
+    if (klines.length > 7) {
+      final price7d = double.parse(klines[klines.length - 8][4]);
+      percentChanges['7d'] = ((currentPrice - price7d) / price7d) * 100;
+    }
+    if (klines.length > 30) {
+      final price30d = double.parse(klines[klines.length - 31][4]);
+      percentChanges['30d'] = ((currentPrice - price30d) / price30d) * 100;
+    }
+    if (klines.length > 90) {
+      final price90d = double.parse(klines[klines.length - 91][4]);
+      percentChanges['90d'] = ((currentPrice - price90d) / price90d) * 100;
+    }
+    if (klines.length > 180) {
+      final price180d = double.parse(klines[klines.length - 181][4]);
+      percentChanges['180d'] = ((currentPrice - price180d) / price180d) * 100;
+    }
+    if (klines.length >= 365) {
+      final price1y = double.parse(klines[0][4]);
+      percentChanges['1y'] = ((currentPrice - price1y) / price1y) * 100;
+    }
+    final MarketPercentModel model = MarketPercentModel(
+        y1: percentChanges['1y'] ?? 0,
+        h24: percentChanges['24h'] ?? 0,
+        d180: percentChanges['180d'] ?? 0,
+        d90: percentChanges['90d'] ?? 0,
+        d30: percentChanges['30d'] ?? 0,
+        d7: percentChanges['7d'] ?? 0);
+    state = state.copyWith(marketPercentModel: model);
+  }
+  Future<void> fetchInitialData(String symbol) async {
+      final String symbolLower = symbol.replaceAll('/', '').toUpperCase();
+      final url = Uri.parse(
+          'https://api.binance.com/api/v3/klines?symbol=${symbolLower}&interval=1m&limit=100');
+      final res = await http.get(url);
+      final List<dynamic> data = jsonDecode(res.body);
+      List<CandlestickData>? datas = [];
+      for (var e in data) {
+        datas.add(CandlestickData(
+          open: double.parse(e[1]),
+          high: double.parse(e[2]),
+          low: double.parse(e[3]),
+          close: double.parse(e[4]),
+          time: DateTime.fromMillisecondsSinceEpoch(e[0]),
+          volume: double.parse(e[5]),
+        ));
+      }
+      state = state.copyWith(candlesticks: datas);
+  }
+
   void _handleTradeEvent(Map<String, dynamic> data) {
     final price = double.parse(data['p']);
     final updatedMarketData = state.marketData.copyWith(
@@ -155,9 +240,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       volume: double.parse(k['v']),
     );
     final updatedCandlesticks = List<CandlestickData>.from(state.candlesticks);
-    final existingIndex = updatedCandlesticks.indexWhere(
-            (candle) => candle.time.millisecondsSinceEpoch == newCandle.time.millisecondsSinceEpoch
-    );
+    final existingIndex = updatedCandlesticks.indexWhere((candle) => candle.time.millisecondsSinceEpoch == newCandle.time.millisecondsSinceEpoch);
     if (existingIndex >= 0) {
       updatedCandlesticks[existingIndex] = newCandle;
     } else {
@@ -168,92 +251,5 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       }
     }
     state = state.copyWith(candlesticks: updatedCandlesticks);
-    String json = jsonEncode(updatedCandlesticks);
-  }
-  void _loadMockData(String symbol) {
-    // Mock market data
-    final marketData = MarketDataModel(
-      price: 87439.63,
-      priceChange: 2213.81,
-      priceChangePercent: 2.58,
-      high24h: 87640.00,
-      low24h: 83949.52,
-      volume24h: 66.56510,
-      lastUpdated: DateTime.now(),
-    );
-
-    // Mock order book
-    final List<OrderBookEntry> bids = [
-      OrderBookEntry(price: 87423.46, quantity: 7.04051),
-      OrderBookEntry(price: 87423.45, quantity: 0.00037),
-      OrderBookEntry(price: 87423.38, quantity: 0.02927),
-      OrderBookEntry(price: 87423.23, quantity: 0.08959),
-      OrderBookEntry(price: 87423.22, quantity: 0.01000),
-      OrderBookEntry(price: 87423.21, quantity: 0.03007),
-      OrderBookEntry(price: 87423.20, quantity: 0.04580),
-      OrderBookEntry(price: 87422.00, quantity: 0.08590),
-      OrderBookEntry(price: 87421.48, quantity: 0.00040),
-      OrderBookEntry(price: 87421.47, quantity: 0.00040),
-    ];
-
-    final List<OrderBookEntry> asks = [
-      OrderBookEntry(price: 87423.47, quantity: 1.11229),
-      OrderBookEntry(price: 87423.48, quantity: 0.00034),
-      OrderBookEntry(price: 87423.49, quantity: 0.00021),
-      OrderBookEntry(price: 87423.50, quantity: 0.02014),
-      OrderBookEntry(price: 87423.51, quantity: 0.00007),
-      OrderBookEntry(price: 87423.59, quantity: 0.00021),
-      OrderBookEntry(price: 87423.60, quantity: 0.02014),
-      OrderBookEntry(price: 87423.63, quantity: 0.00013),
-      OrderBookEntry(price: 87429.28, quantity: 0.00006),
-      OrderBookEntry(price: 87430.45, quantity: 0.00228),
-    ];
-
-    final orderBook = OrderBookData(
-      bids: bids,
-      asks: asks,
-      lastUpdateId: 123456789,
-    );
-
-    // Mock candlestick data
-    final now = DateTime.now();
-    final List<CandlestickData> candlesticks = [];
-
-    for (int i = 0; i < 100; i++) {
-      final time = now.subtract(Duration(minutes: 100 - i));
-      double open = 85000 + (i * 30) + (i % 2 == 0 ? -50 : 50);
-      double close = open + (i % 3 == 0 ? 100 : -50);
-
-      candlesticks.add(CandlestickData(
-        time: time,
-        open: open,
-        high: close > open ? close + 20 : open + 20,
-        low: close < open ? close - 20 : open - 20,
-        close: close,
-        volume: 10 + (i % 10),
-      ));
-    }
-
-    state = state.copyWith(
-      marketData: marketData,
-      orderBook: orderBook,
-      candlesticks: candlesticks,
-      isConnected: true,
-    );
   }
 }
-final websocketConnectionProvider = StateNotifierProvider<WebSocketNotifier, WebSocketState>((ref) {
-  return WebSocketNotifier();
-});
-final marketDataProvider = Provider<MarketDataModel>((ref) {
-  return ref.watch(websocketConnectionProvider).marketData;
-});
-final candlesticksProvider = Provider<List<CandlestickData>>((ref) {
-  return ref.watch(websocketConnectionProvider).candlesticks;
-});
-final orderBookProvider = Provider<OrderBookData>((ref) {
-  return ref.watch(websocketConnectionProvider).orderBook;
-});
-final connectionStatusProvider = Provider<bool>((ref) {
-  return ref.watch(websocketConnectionProvider).isConnected;
-});

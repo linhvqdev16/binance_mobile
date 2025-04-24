@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       key: navigatorKey,
       locale: _locale,
-      theme: ThemeData(fontFamily: 'IBMPFonts'),
+      theme: ThemeData(fontFamily: 'IBMPFonts',  scaffoldBackgroundColor: Colors.white, ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

@@ -1,25 +1,15 @@
-import 'package:binance_mobile/presentations/provider/detail_page_provider/websocket_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class CoinPriceHeader extends ConsumerWidget {
   final String symbol;
-  final numberFormat = NumberFormat("#,##0.00", "en_US");
 
   CoinPriceHeader({super.key, required this.symbol});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final marketData = ref.watch(marketDataProvider);
-    final isConnected = ref.watch(connectionStatusProvider);
-
-    final priceText = numberFormat.format(marketData.price);
-    final changeText = marketData.priceChangePercent.toStringAsFixed(2);
-    final isPositive = marketData.priceChangePercent >= 0;
-
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           Row(
@@ -88,41 +78,6 @@ class CoinPriceHeader extends ConsumerWidget {
               )
             ],
           ),
-
-          // Padding(
-          //   padding: const EdgeInsets.only(left: 12),
-          //   child: Row(
-          //     children: [
-          //       Text(
-          //         priceText,
-          //         style: const TextStyle(
-          //           fontSize: 24,
-          //           fontWeight: FontWeight.bold,
-          //           color: Colors.green,
-          //         ),
-          //       ),
-          //       const SizedBox(width: 8),
-          //       Container(
-          //         padding:
-          //             const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          //         decoration: BoxDecoration(
-          //           color: isPositive
-          //               ? Colors.green.withOpacity(0.2)
-          //               : Colors.red.withOpacity(0.2),
-          //           borderRadius: BorderRadius.circular(4),
-          //         ),
-          //         child: Text(
-          //           "${isPositive ? '+' : ''}$changeText%",
-          //           style: TextStyle(
-          //             fontSize: 14,
-          //             fontWeight: FontWeight.bold,
-          //             color: isPositive ? Colors.green : Colors.red,
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       ),
     );
