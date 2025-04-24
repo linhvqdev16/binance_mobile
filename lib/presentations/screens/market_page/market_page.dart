@@ -1,6 +1,7 @@
+import 'package:binance_mobile/data/models/models/market_ticker_model.dart';
+import 'package:binance_mobile/presentations/riverpod/home_usecase/market_ticker_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:binance_mobile/presentations/riverpod/home_usecase/market_provider.dart';
 
 class MarketPage extends ConsumerStatefulWidget {
   const MarketPage({super.key});
@@ -216,15 +217,15 @@ class _MarketPageState extends ConsumerState<MarketPage>
             child: Row(
               children: [
                 Text(
-                  'Tên / KL',
+                  'Tên',
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 1),
                 Image.asset(
                   'assets/images/sort.png',
-                  width: 11,
-                  height: 11,
-                  color: Colors.grey[600],
+                  width: 10,
+                  height: 10,
+                  color: Colors.grey[500],
                 ),
               ],
             ),
@@ -238,12 +239,12 @@ class _MarketPageState extends ConsumerState<MarketPage>
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   textAlign: TextAlign.right,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 1),
                 Image.asset(
                   'assets/images/sort.png',
-                  width: 11,
-                  height: 11,
-                  color: Colors.grey[600],
+                  width: 10,
+                  height: 10,
+                  color: Colors.grey[500],
                 ),
               ],
             ),
@@ -257,12 +258,12 @@ class _MarketPageState extends ConsumerState<MarketPage>
                   'Thay đổi 24h',
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 1),
                 Image.asset(
                   'assets/images/sort.png',
-                  width: 11,
-                  height: 11,
-                  color: Colors.grey[600],
+                  width: 10,
+                  height: 10,
+                  color: Colors.grey[500],
                 ),
               ],
             ),
@@ -273,7 +274,7 @@ class _MarketPageState extends ConsumerState<MarketPage>
   }
 
 //Dữ liệu
-  Widget _buildCryptoList(Size screenSize, MarketData marketData) {
+  Widget _buildCryptoList(Size screenSize, MarketTickerState marketData) {
     final marketNotifier = ref.read(marketProvider.notifier);
     return ListView.builder(
       itemCount: marketNotifier.watchlist.length,

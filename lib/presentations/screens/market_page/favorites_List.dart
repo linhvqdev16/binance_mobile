@@ -1,4 +1,5 @@
-import 'package:binance_mobile/presentations/riverpod/home_usecase/favoriteList_provider.dart';
+import 'package:binance_mobile/data/models/models/market_ticker_model.dart';
+import 'package:binance_mobile/presentations/riverpod/home_usecase/market_ticker_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +14,16 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
+  final Map<String, int> _leverages = {
+    'BNBUSDT': 10,
+    'BTCUSDT': 10,
+    'ETHUSDT': 10,
+    'SOLUSDT': 5,
+    'XRPUSDT': 10,
+    'REDUSDT': 5,
+    'ADAUSDT': 10,
+    'PEPEUSDT': 5
+  };
   @override
   void initState() {
     super.initState();
@@ -37,7 +48,7 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final favoriteData = ref.watch(favoriteListProvider);
+    final favoriteData = ref.watch(favoriteProvider);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -162,15 +173,26 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
             child: Row(
               children: [
                 Text(
-                  'Tên / KL',
+                  'Tên',
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 1),
                 Image.asset(
                   'assets/images/sort.png',
-                  width: 11,
-                  height: 11,
-                  color: Colors.grey[600],
+                  width: 10,
+                  height: 10,
+                  color: Colors.grey[500],
+                ),
+                Text(
+                  ' / KL',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+                const SizedBox(width: 1),
+                Image.asset(
+                  'assets/images/sort.png',
+                  width: 10,
+                  height: 10,
+                  color: Colors.grey[500],
                 ),
               ],
             ),
@@ -184,12 +206,12 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   textAlign: TextAlign.right,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 1),
                 Image.asset(
                   'assets/images/sort.png',
-                  width: 11,
-                  height: 11,
-                  color: Colors.grey[600],
+                  width: 10,
+                  height: 10,
+                  color: Colors.grey[500],
                 ),
               ],
             ),
@@ -203,12 +225,12 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
                   'Thay đổi 24h',
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 1),
                 Image.asset(
                   'assets/images/sort.png',
-                  width: 11,
-                  height: 11,
-                  color: Colors.grey[600],
+                  width: 10,
+                  height: 10,
+                  color: Colors.grey[500],
                 ),
               ],
             ),
@@ -219,8 +241,8 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
   }
 
 //Dữ liệu
-  Widget _buildCryptoList(Size screenSize, FavoriteList favoriteData) {
-    final marketNotifier = ref.read(favoriteListProvider.notifier);
+  Widget _buildCryptoList(Size screenSize, MarketTickerState favoriteData) {
+    final marketNotifier = ref.read(favoriteProvider.notifier);
     return ListView.builder(
       itemCount: marketNotifier.watchlist.length,
       shrinkWrap: true,
@@ -232,7 +254,7 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
         final prevPrice = favoriteData.prevPrices[symbol] ?? price;
         final percentChange = favoriteData.percentChanges[symbol] ?? 0.0;
         final volume = favoriteData.volumes[symbol] ?? 0.0;
-        final leverage = marketNotifier.leverages[symbol] ?? 1;
+        final leverage = _leverages[symbol] ?? 1;
 
         Color priceColor = price > prevPrice
             ? const Color(0xFF25C26E)

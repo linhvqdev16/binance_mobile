@@ -71,7 +71,6 @@ class _MarketPageChartState extends State<MarketPageChart> {
       ['18,15', '5.686,63'],
     ];
     //mặc định chọn nút Sổ lệnh
-    String selected = 'Sổ lệnh';
     String selectedValue = '0.1';
     return Scaffold(
       backgroundColor: Colors.white,

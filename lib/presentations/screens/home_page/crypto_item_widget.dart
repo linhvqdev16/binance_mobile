@@ -7,13 +7,10 @@ class CryptoItemWidget extends StatelessWidget {
   final Size screenSize;
 
   const CryptoItemWidget(
-      {Key? key, required this.ticker, required this.screenSize})
-      : super(key: key);
+      {super.key, required this.ticker, required this.screenSize});
 
   @override
   Widget build(BuildContext context) {
-    final formattedSymbol = ticker.symbol.replaceAll('USDT', '');
-
     // Format price with NumberFormat for proper decimal places
     final priceFormatter = NumberFormat('#,##0.00', 'en_US');
     final priceDisplay = double.tryParse(ticker.price) != null

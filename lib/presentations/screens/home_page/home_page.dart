@@ -1,8 +1,7 @@
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/presentations/screens/home_page/crypto_list_widget.dart';
-import 'package:binance_mobile/presentations/screens/market_page/marketDetail_page.dart';
 import 'package:binance_mobile/presentations/screens/market_page/market_Home.dart';
-import 'package:binance_mobile/presentations/screens/market_page/market_page.dart';
+import 'package:binance_mobile/presentations/screens/trade_page/trade_home.dart';
 import 'package:binance_mobile/presentations/widgets/error/error_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -16,10 +15,17 @@ class MainPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
+    // ignore: no_leading_underscores_for_local_identifiers
     final List<Widget> _screens = [
       HomePage(),
-      const MarketPageChart(),
       const MarketHome(),
+      const TradeHome(),
+      const Center(
+        child: Text('Đây là màn Futures'),
+      ),
+      const Center(
+        child: Text('Đây là màn tài sản'),
+      ),
     ];
 
     return Scaffold(
