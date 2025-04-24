@@ -267,7 +267,7 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
           // Trading chart
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.55,
-            child: TradingChart(),
+            child: BinanceCandleChart(),
           ),
 
           // const IndicatorTabs(),

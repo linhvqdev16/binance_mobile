@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:binance_mobile/data/models/models/candlestick_data_model.dart';
 import 'package:binance_mobile/data/models/models/market_data_model.dart';
 import 'package:binance_mobile/data/models/models/order_book_data.dart';
@@ -166,6 +168,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       }
     }
     state = state.copyWith(candlesticks: updatedCandlesticks);
+    String json = jsonEncode(updatedCandlesticks);
   }
   void _loadMockData(String symbol) {
     // Mock market data
