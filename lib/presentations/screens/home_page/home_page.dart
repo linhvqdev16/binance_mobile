@@ -2,6 +2,7 @@ import 'package:binance_mobile/core/dependency_injection/injection_container.dar
 import 'package:binance_mobile/presentations/screens/home_page/crypto_list_widget.dart';
 import 'package:binance_mobile/presentations/screens/market_page/market_Home.dart';
 import 'package:binance_mobile/presentations/screens/trade_page/trade_home.dart';
+import 'package:binance_mobile/presentations/screens/wallets_page/wallets_home.dart';
 import 'package:binance_mobile/presentations/widgets/error/error_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -23,9 +24,7 @@ class MainPage extends ConsumerWidget {
       const Center(
         child: Text('Đây là màn Futures'),
       ),
-      const Center(
-        child: Text('Đây là màn tài sản'),
-      ),
+      const WalletsHome()
     ];
 
     return Scaffold(

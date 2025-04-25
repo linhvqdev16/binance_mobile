@@ -44,6 +44,7 @@ class _MarketPageState extends ConsumerState<MarketPage>
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 5),
             _buildFilterOptions(screenSize),

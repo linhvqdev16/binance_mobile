@@ -134,7 +134,8 @@ class _MarketHomeState extends ConsumerState<MarketHome>
         return const FavoritesList();
       case 1:
         return const MarketPage();
-
+      case 2:
+        return Container();
       default:
         return const SizedBox();
     }

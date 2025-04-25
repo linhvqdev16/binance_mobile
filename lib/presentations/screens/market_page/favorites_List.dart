@@ -54,6 +54,7 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 5),
             _buildFilterOptions(screenSize),
