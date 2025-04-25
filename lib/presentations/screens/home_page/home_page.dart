@@ -1,129 +1,63 @@
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
+import 'package:binance_mobile/presentations/screens/detail_page/detail_page.dart';
 import 'package:binance_mobile/presentations/screens/home_page/crypto_list_widget.dart';
-import 'package:binance_mobile/presentations/screens/market_page/market_demo.dart';
-import 'package:binance_mobile/presentations/screens/market_page/market_demo2.dart';
-import 'package:binance_mobile/presentations/screens/market_page/market_page.dart';
+import 'package:binance_mobile/presentations/screens/market_page/market_home.dart';
+import 'package:binance_mobile/presentations/screens/trade_page/trade_home.dart';
 import 'package:binance_mobile/presentations/widgets/error/error_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final selectedIndexProvider = StateProvider<int>((ref) => 0);
-
-class MainPage extends ConsumerWidget {
-  const MainPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedIndex = ref.watch(selectedIndexProvider);
-    final List<Widget> _screens = [
-      HomePage(),
-      MarketPage(),
-      BinanceTracker(),
-      BinanceChart()
-    ];
-
-    return Scaffold(
-      body: _screens[selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
-        onTap: (index) {
-          ref.read(selectedIndexProvider.notifier).state = index;
-        },
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey.withOpacity(0.5),
-        selectedLabelStyle: const TextStyle(fontSize: 12, color: Colors.black),
-        unselectedLabelStyle: const TextStyle(fontSize: 12),
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/house.png',
-              width: 25,
-              height: 25,
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/statistics.png',
-              width: 25,
-              height: 25,
-            ),
-            label: 'Markets',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/trade.png',
-              width: 25,
-              height: 25,
-            ),
-            label: 'Trade',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/future.png',
-              width: 25,
-              height: 25,
-            ),
-            label: 'Futures',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/wallet.png',
-              width: 25,
-              height: 25,
-            ),
-            label: 'Wallets',
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class HomePage extends ConsumerWidget {
   HomePage({super.key});
-
-  final selectedIndexProvider = StateProvider<int>((ref) => 0);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ignore: unused_local_variable
-    final appLocalizations = AppLocalizations.of(context)!;
-
-    // ignore: unused_local_variable
-    final selectedIndex = ref.watch(selectedIndexProvider);
-
+    // final appLocalizations = AppLocalizations.of(context)!;
+    // final selectedIndex = ref.watch(selectedIndexProvider);
     final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
+
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Chuyển đến màn hình DetailPage khi bấm nút
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CoinDetailScreen(symbol: 'btc/usdt'),
+                    ),
+                  );
+                },
+                child: Text("Go to Detail Page"),
+              ),
+            ),
+            
             _buildHeader(screenSize),
-            _buildBalanceSection(screenSize),
+            _buildBalanceSection(screenSize, context),
             _buildQuickActions(screenSize),
             _buildMarketTabs(screenSize, ref),
             _buildMarketFilters(screenSize),
-            _buildHeaderCryptoItem(screenSize),
-            _buildMarketList(screenSize, ref),
-            Center(
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-                child: const Text(
-                  'View More',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFFF8F00),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-            _buildDiscoveryTabs(screenSize),
+            // _buildHeaderCryptoItem(screenSize),
+            // _buildMarketList(screenSize, ref),
+            // Center(
+            //   child: Padding(
+            //     padding:
+            //         EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+            //     child: const Text(
+            //       'View More',
+            //       style: TextStyle(
+            //         fontSize: 14,
+            //         color: Color(0xFFFF8F00),
+            //         fontWeight: FontWeight.w500,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // _buildDiscoveryTabs(screenSize),
           ],
         ),
       ),
@@ -238,7 +172,7 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildBalanceSection(Size screenSize) {
+  Widget _buildBalanceSection(Size screenSize, BuildContext context) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(screenSize.width * 0.04),

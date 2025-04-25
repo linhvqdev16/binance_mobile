@@ -26,14 +26,17 @@ final getCryptoStreamUseCaseProvider = Provider<GetCryptoStreamUseCase>(
     repository: ref.watch(cryptoRepositoryProvider),
   ),
 );
+
 final cryptoNotifierProvider = StateNotifierProvider<CryptoNotifier, CryptoState>(
       (ref) => CryptoNotifier(
     getCryptoStreamUseCase: ref.watch(getCryptoStreamUseCaseProvider),
   ),
 );
+
 final websocketConnectionProvider = StateNotifierProvider<WebSocketNotifier, WebSocketState>((ref) {
   return WebSocketNotifier();
 });
+
 final websocketBidsAskProvider = StateNotifierProvider<BidsAskSocketNotifier, BidsAskSocketState>((ref) {
   return BidsAskSocketNotifier();
 });
@@ -52,6 +55,7 @@ final orderBookProvider = Provider<OrderBookData>((ref) {
 final connectionStatusProvider = Provider<bool>((ref) {
   return ref.watch(websocketConnectionProvider).isConnected;
 });
+final selectedIndexProvider = StateProvider<int>((ref) => 0);
 Future<void> init() async {
   // Any initialization logic if needed
 }
