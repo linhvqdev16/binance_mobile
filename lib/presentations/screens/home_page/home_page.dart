@@ -16,8 +16,7 @@ class MainPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
-    // ignore: no_leading_underscores_for_local_identifiers
-    final List<Widget> _screens = [
+    final List<Widget> screens = [
       HomePage(),
       const MarketHome(),
       const TradeHome(),
@@ -28,7 +27,7 @@ class MainPage extends ConsumerWidget {
     ];
 
     return Scaffold(
-      body: _screens[selectedIndex],
+      body: screens[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: (index) {

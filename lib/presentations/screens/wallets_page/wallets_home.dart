@@ -1,3 +1,4 @@
+import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/deposit_page_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,8 +11,8 @@ class WalletsHome extends ConsumerStatefulWidget {
 
 class _WalletsHomeState extends ConsumerState<WalletsHome>
     with SingleTickerProviderStateMixin {
-  List<String> currencies = ['VND', 'USD', 'EUR'];
-  String selectedCurrency = 'VND';
+  List<String> currencies = ['BTC', 'ETH', 'BNB', 'USDT', 'USD'];
+  String selectedCurrency = 'BTC';
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -112,7 +113,13 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
           SizedBox(
             width: MediaQuery.of(context).size.width,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const DipositPageHome()),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xfffad65f),
                 shape: RoundedRectangleBorder(
