@@ -1,4 +1,6 @@
 import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/depositAED.dart';
+import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/depositP2P.dart';
+import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/depositPay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -58,14 +60,26 @@ class _DipositPageHomeState extends ConsumerState<DipositPageHome>
                   title: 'Mua bằng AED (P2P)',
                   subtitle:
                       'Mua từ người dùng. Giá cả cạnh tranh. Thanh toán nội địa.',
-                  onTap: () => {}),
+                  onTap: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DipositP2PScreen()),
+                        )
+                      }),
               const SizedBox(height: 15),
               buildFeatureBox(
                   screenSize: screenSize,
                   imagePath: 'assets/images/purse.png',
                   title: 'Nhận qua Pay',
                   subtitle: 'Nhận tiền mã hóa từ những người dùng Binance khác',
-                  onTap: () => {}),
+                  onTap: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DipositPayScreen()),
+                        )
+                      }),
               const SizedBox(height: 40),
               Padding(
                 padding: EdgeInsets.only(left: screenSize.width * 0.03),

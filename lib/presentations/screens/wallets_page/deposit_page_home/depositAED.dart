@@ -137,7 +137,11 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Row(
                         children: [
-                          Icon(Icons.search, color: Colors.grey.shade500),
+                          Icon(
+                            Icons.search,
+                            color: Colors.grey.shade500,
+                            size: 10,
+                          ),
                           const SizedBox(width: 8),
                           const Expanded(
                             child: TextField(
@@ -145,7 +149,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                                 hintText: 'Tìm',
                                 border: InputBorder.none,
                                 contentPadding:
-                                    EdgeInsets.symmetric(vertical: 12),
+                                    EdgeInsets.symmetric(vertical: 10),
                               ),
                             ),
                           ),
@@ -355,7 +359,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.03),
       child: Container(
-        width: screenSize.width * 0.35,
+        width: screenSize.width * 0.3,
         height: screenSize.height * 0.05,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
@@ -383,7 +387,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                         color: isBuy ? Colors.white : Colors.black54,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Roboto',
-                        fontSize: 15),
+                        fontSize: 14),
                   ),
                 ),
               ),
@@ -408,7 +412,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                         color: !isBuy ? Colors.white : Colors.black54,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Roboto',
-                        fontSize: 15),
+                        fontSize: 14),
                   ),
                 ),
               ),
@@ -425,50 +429,55 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
       padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.03),
       alignment: Alignment.centerLeft,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                amount,
-                style: const TextStyle(
-                  fontSize: 60,
-                  fontWeight: FontWeight.w300,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Text(
+                  amount,
+                  style: TextStyle(
+                      fontSize: 60,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.grey[400]),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Row(
-                  children: [
-                    Text(
-                      'AED',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Roboto',
-                        color: Colors.black87,
+                const SizedBox(width: 10),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Row(
+                    children: [
+                      Text(
+                        'AED',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'Roboto',
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    Icon(Icons.keyboard_arrow_down, size: 20),
-                  ],
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Icon(Icons.arrow_drop_down, size: 20),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const Row(
             children: [
-              Icon(Icons.swap_vert, size: 15, color: Colors.grey),
+              Icon(Icons.swap_vert, size: 15, color: Colors.black),
               SizedBox(width: 8),
               Text(
                 '0 USDT',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey,
+                  color: Colors.black,
                 ),
               ),
             ],
@@ -506,8 +515,8 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
               Text(
                 selectedCrypto,
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                   color: Colors.black,
                 ),
               ),
@@ -515,7 +524,11 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
               const Icon(Icons.verified, color: Colors.amber, size: 16),
             ],
           ),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: Icon(
+            Icons.chevron_right,
+            color: Colors.grey[400],
+            size: 20,
+          ),
           onTap: _showCryptoListBottomSheet,
         ),
       ),
@@ -531,24 +544,28 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
           bottom: BorderSide(color: Colors.grey.shade300),
         ),
       ),
-      child: const ListTile(
-        leading: Icon(Icons.account_balance, color: Colors.black),
-        title: Text(
+      child: ListTile(
+        leading: const Icon(Icons.account_balance, color: Colors.black),
+        title: const Text(
           'Thanh toán bằng',
           style: TextStyle(
             color: Colors.grey,
             fontSize: 14,
           ),
         ),
-        subtitle: Text(
+        subtitle: const Text(
           'Chuyển khoản ngân hàng',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 16,
             color: Colors.black,
           ),
         ),
-        trailing: Icon(Icons.chevron_right),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: Colors.grey[400],
+          size: 20,
+        ),
       ),
     );
   }
@@ -570,11 +587,11 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 7),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade200),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
                     child: const Text('70 đ',
@@ -590,11 +607,11 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 7),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade200),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
                     child: const Text('200 đ',
@@ -610,11 +627,11 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 7),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade200),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
                     child: const Text('Tối đa',
@@ -632,42 +649,39 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
   // Numeric Keypad Widget
   Widget numericKeypad({required Function(String) onKeyPressed}) {
     Widget buildKeypadButton(String value) {
-      bool isBackspace = value == '⌫';
       return InkWell(
         onTap: () => onKeyPressed(value),
         child: Container(
           alignment: Alignment.center,
           child: Text(
             value,
-            style: TextStyle(
-              fontSize: isBackspace ? 16 : 24,
-              fontWeight: isBackspace ? FontWeight.w500 : FontWeight.normal,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
       );
     }
 
-    return Container(
-      child: GridView.count(
-        crossAxisCount: 3,
-        childAspectRatio: 2.5,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          buildKeypadButton('1'),
-          buildKeypadButton('2'),
-          buildKeypadButton('3'),
-          buildKeypadButton('4'),
-          buildKeypadButton('5'),
-          buildKeypadButton('6'),
-          buildKeypadButton('7'),
-          buildKeypadButton('8'),
-          buildKeypadButton('9'),
-          buildKeypadButton('.'),
-          buildKeypadButton('0'),
-          buildKeypadButton('Del'),
-        ],
-      ),
+    return GridView.count(
+      crossAxisCount: 3,
+      childAspectRatio: 2.5,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        buildKeypadButton('1'),
+        buildKeypadButton('2'),
+        buildKeypadButton('3'),
+        buildKeypadButton('4'),
+        buildKeypadButton('5'),
+        buildKeypadButton('6'),
+        buildKeypadButton('7'),
+        buildKeypadButton('8'),
+        buildKeypadButton('9'),
+        buildKeypadButton('.'),
+        buildKeypadButton('0'),
+        buildKeypadButton('Del'),
+      ],
     );
   }
 }
