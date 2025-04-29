@@ -9,10 +9,29 @@ class DepositAEDPage extends ConsumerStatefulWidget {
 }
 
 class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
-  String amount = "0";
+  String amount = "";
   bool isBuy = true;
   String selectedCrypto = "USDT";
   String selectedCryptoFullName = "TetherUS";
+
+  void removeDigit() {
+    setState(() {
+      if (amount.isNotEmpty) {
+        amount = amount.substring(0, amount.length - 1);
+      }
+    });
+  }
+
+  void addDigit(String digit) {
+    setState(() {
+      if (digit == ',' && amount.contains(',')) return;
+      if (amount.isEmpty && digit == ',') {
+        amount = '0,';
+      } else {
+        amount += digit;
+      }
+    });
+  }
 
   final List<Map<String, dynamic>> cryptoList = [
     {
@@ -292,43 +311,27 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(screenSize),
-            SizedBox(height: screenSize.height * 0.015),
-            _buildBuySellWidget(screenSize),
-            SizedBox(height: screenSize.height * 0.015),
-            _buildPriceChange(screenSize),
-            SizedBox(height: screenSize.height * 0.015),
-            _buildBuyCoin(screenSize),
-            SizedBox(height: screenSize.height * 0.015),
-            _buildPayment(screenSize),
-            SizedBox(height: screenSize.height * 0.015),
-            _buildAmountButtons(screenSize),
-            Expanded(
-              child: numericKeypad(
-                onKeyPressed: (value) {
-                  setState(() {
-                    if (value == 'Del') {
-                      if (amount.length > 1) {
-                        amount = amount.substring(0, amount.length - 1);
-                      } else {
-                        amount = '0';
-                      }
-                    } else if (amount == '0' && value != '.') {
-                      amount = value;
-                    } else {
-                      if (value == '.' && amount.contains('.')) {
-                        return;
-                      }
-                      amount += value;
-                    }
-                  });
-                },
-              ),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(screenSize),
+              SizedBox(height: screenSize.height * 0.015),
+              _buildBuySellWidget(screenSize),
+              SizedBox(height: screenSize.height * 0.015),
+              _buildPriceChange(screenSize),
+              SizedBox(height: screenSize.height * 0.015),
+              _buildBuyCoin(screenSize),
+              SizedBox(height: screenSize.height * 0.015),
+              _buildPayment(screenSize),
+              SizedBox(height: screenSize.height * 0.01),
+              _buildAmountButtons(screenSize),
+              buildNumberRow(['1', '2', '3']),
+              buildNumberRow(['4', '5', '6']),
+              buildNumberRow(['7', '8', '9']),
+              buildNumberRow([',', '0', 'backspace']),
+            ],
+          ),
         ),
       ),
     );
@@ -647,41 +650,55 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
   }
 
   // Numeric Keypad Widget
-  Widget numericKeypad({required Function(String) onKeyPressed}) {
-    Widget buildKeypadButton(String value) {
-      return InkWell(
-        onTap: () => onKeyPressed(value),
-        child: Container(
-          alignment: Alignment.center,
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
+  Widget buildNumberRow(List<String> numbers) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: numbers.map((number) {
+          if (number == 'backspace') {
+            return NumberKey(
+              child: const Icon(Icons.backspace),
+              onTap: () => removeDigit(),
+            );
+          }
+          return NumberKey(
+            child: Text(
+              number,
+              style: const TextStyle(
+                  fontSize: 24,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500),
             ),
-          ),
-        ),
-      );
-    }
+            onTap: () => addDigit(number),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
 
-    return GridView.count(
-      crossAxisCount: 3,
-      childAspectRatio: 2.5,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
-        buildKeypadButton('1'),
-        buildKeypadButton('2'),
-        buildKeypadButton('3'),
-        buildKeypadButton('4'),
-        buildKeypadButton('5'),
-        buildKeypadButton('6'),
-        buildKeypadButton('7'),
-        buildKeypadButton('8'),
-        buildKeypadButton('9'),
-        buildKeypadButton('.'),
-        buildKeypadButton('0'),
-        buildKeypadButton('Del'),
-      ],
+class NumberKey extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const NumberKey({
+    super.key,
+    required this.child,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(40),
+      child: Container(
+        width: 60,
+        height: 60,
+        alignment: Alignment.center,
+        child: child,
+      ),
     );
   }
 }

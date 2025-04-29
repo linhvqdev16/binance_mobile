@@ -8,6 +8,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class MarketTickerNotifier extends StateNotifier<MarketTickerState> {
   final List<String> watchlist;
   WebSocketChannel? _channel;
+  // final Set<String> _receivedSymbols = {};
 
   MarketTickerNotifier({required this.watchlist})
       : super(MarketTickerState(
@@ -49,15 +50,17 @@ class MarketTickerNotifier extends StateNotifier<MarketTickerState> {
         if (!newPrevPrices.containsKey(symbol)) {
           newPrevPrices[symbol] = closePrice;
         }
+        // _receivedSymbols.add(symbol);
       }
-
+      // final bool hasReceivedAllSymbols =
+      //     _receivedSymbols.length == watchlist.length;
       state = state.copyWith(
-        tickerData: newTickerData,
-        percentChanges: newPercentChanges,
-        volumes: newVolumes,
-        prevPrices: newPrevPrices,
-        isLoading: false,
-      );
+          tickerData: newTickerData,
+          percentChanges: newPercentChanges,
+          volumes: newVolumes,
+          prevPrices: newPrevPrices,
+          // isLoading: hasReceivedAllSymbols ? false : state.isLoading,
+          isLoading: false);
 
       Future.delayed(const Duration(milliseconds: 300), () {
         final updatedPrevPrices = Map<String, double>.from(state.prevPrices);

@@ -1,4 +1,5 @@
 import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/deposit_page_home.dart';
+import 'package:binance_mobile/presentations/screens/wallets_page/wallets_buy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,15 +29,35 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
               SizedBox(
                 height: screenSize.height * 0.032,
               ),
-              _totalBalanceCardUSTD(screenSize),
+              _buildBalanceCard(
+                screenSize: screenSize,
+                imagePath: 'assets/images/ustd.png',
+                coinName: 'USTD',
+                subTitle: 'Stablecoin',
+                price: '1 \$',
+              ),
               SizedBox(
                 height: screenSize.height * 0.02,
               ),
-              _totalBalanceCardBTC(screenSize),
-              SizedBox(
-                height: screenSize.height * 0.02,
+              _buildBalanceCard(
+                screenSize: screenSize,
+                imagePath: 'assets/images/bitcoin.png',
+                coinName: 'BTC',
+                growthPercent: '+ 131.1 %',
+                growthTime: 'Trong 3 năm qua',
+                price: '99.433,1 \$',
               ),
-              _totalBalanceCardBNB(screenSize),
+              SizedBox(
+                height: screenSize.height * 0.022,
+              ),
+              _buildBalanceCard(
+                screenSize: screenSize,
+                imagePath: 'assets/images/binance.png',
+                coinName: 'BNB',
+                growthPercent: '+ 48.49 %',
+                growthTime: 'Trong 3 năm qua',
+                price: '600,37 \$',
+              ),
             ],
           ),
         ),
@@ -143,7 +164,15 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
     );
   }
 
-  Widget _totalBalanceCardUSTD(Size screenSize) {
+  Widget _buildBalanceCard({
+    required Size screenSize,
+    required String imagePath,
+    required String coinName,
+    String? subTitle,
+    String? growthPercent,
+    String? growthTime,
+    required String price,
+  }) {
     return Container(
       width: screenSize.width,
       height: screenSize.height * 0.15,
@@ -158,216 +187,79 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: growthPercent != null
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.start,
               children: [
-                Image.asset('assets/images/ustd.png', width: 28, height: 28),
-                const SizedBox(width: 8),
-                const Text('USTD',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    )),
-                const SizedBox(width: 8),
-                const Text('Stablecoin',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 13,
-                    )),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Giá gần nhất',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 13,
-                    )),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('1 \$',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        )),
-                    GestureDetector(
-                      onTap: () {},
-                      child: const Text(
-                        'Mua ngay',
-                        style: TextStyle(
-                          color: Color(0xfffad65f),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    Image.asset(imagePath, width: 28, height: 28),
+                    const SizedBox(width: 8),
+                    Text(
+                      coinName,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ],
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _totalBalanceCardBTC(Size screenSize) {
-    return Container(
-      width: screenSize.width,
-      height: screenSize.height * 0.15,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.03),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Image.asset('assets/images/bitcoin.png',
-                        width: 28, height: 28),
-                    const SizedBox(width: 8),
-                    const Text('BTC ',
-                        style: TextStyle(
+                    if (subTitle != null) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        subTitle,
+                        style: const TextStyle(
                           color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        )),
-                  ],
-                ),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '+ 131.1 %',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
-                    ),
-                    Text(
-                      'Trong 3 năm qua',
-                      style: TextStyle(color: Colors.black, fontSize: 13),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Giá gần nhất',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 13,
-                    )),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('99.433,1 \$',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        )),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {},
-                      child: const Text(
-                        'Mua ngay',
-                        style: TextStyle(
-                          color: Color(0xfffad65f),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _totalBalanceCardBNB(Size screenSize) {
-    return Container(
-      width: screenSize.width,
-      height: screenSize.height * 0.15,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.03),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Image.asset('assets/images/binance.png',
-                        width: 28, height: 28),
-                    const SizedBox(width: 8),
-                    const Text('BNB ',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        )),
-                  ],
-                ),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '+ 48.49 %',
-                      style: TextStyle(
+                if (growthPercent != null && growthTime != null)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        growthPercent,
+                        style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontSize: 20),
-                    ),
-                    Text(
-                      'Trong 3 năm qua',
-                      style: TextStyle(color: Colors.black, fontSize: 13),
-                    )
-                  ],
-                ),
+                          fontSize: 20,
+                        ),
+                      ),
+                      Text(
+                        growthTime,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 13),
+                      )
+                    ],
+                  ),
               ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Giá gần nhất',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 13,
-                    )),
+                    style: TextStyle(color: Colors.black, fontSize: 13)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('600,37 \$',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        )),
-                    const SizedBox(width: 8),
+                    Text(
+                      price,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const WalletsBuy()),
+                        );
+                      },
                       child: const Text(
                         'Mua ngay',
                         style: TextStyle(
