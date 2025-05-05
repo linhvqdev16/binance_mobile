@@ -1,4 +1,5 @@
 import 'package:binance_mobile/data/models/models/market_ticker_model.dart';
+import 'package:binance_mobile/presentations/screens/detail_page/detail_page.dart';
 import 'package:binance_mobile/presentations/service/home_usecase/market_ticker_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,6 +55,7 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 5),
             _buildFilterOptions(screenSize),
@@ -68,7 +70,6 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
     );
   }
 
-//loadding chờ dữ liệu
   Widget _buildLoadingWidget() {
     return Center(
       child: Column(
@@ -104,7 +105,6 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
     );
   }
 
-//Tiền mã hóa + Giao ngay + USDM + COIN-M + Quyền chọn
   Widget _buildFilterOptions(Size screenSize) {
     return Row(
       children: [
@@ -260,100 +260,109 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
             ? const Color(0xFF25C26E)
             : (price < prevPrice ? const Color(0xFFF6465D) : Colors.black);
 
-        return Container(
-          padding:
-              const EdgeInsets.only(left: 16.0, right: 10, top: 12, bottom: 12),
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          baseAsset,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+        return GestureDetector(
+          onTap: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CoinDetailScreen(symbol: symbol)),
+            );
+          },
+          child: Container(
+            padding:
+                const EdgeInsets.only(left: 16.0, right: 10, top: 12, bottom: 12),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            baseAsset,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '/USDT ${leverage}x',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
+                          const SizedBox(width: 4),
+                          Text(
+                            '/USDT ${leverage}x',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${volume.toStringAsFixed(2)}M',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        '${volume.toStringAsFixed(2)}M',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    AnimatedDefaultTextStyle(
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: priceColor,
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      AnimatedDefaultTextStyle(
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: priceColor,
+                        ),
+                        duration: const Duration(milliseconds: 300),
+                        child: Text(
+                          _formatPrice(price),
+                        ),
                       ),
-                      duration: const Duration(milliseconds: 300),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${_formatPrice(price)} \$',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: screenSize.width * 0.03),
+                Expanded(
+                  flex: 1,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      width: 85,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: _getChangeColor(percentChange),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                       child: Text(
-                        _formatPrice(price),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_formatPrice(price)} \$',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: screenSize.width * 0.03),
-              Expanded(
-                flex: 1,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    width: 85,
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: _getChangeColor(percentChange),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      '${percentChange >= 0 ? "+" : ""}${percentChange.toStringAsFixed(2)}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        '${percentChange >= 0 ? "+" : ""}${percentChange.toStringAsFixed(2)}%',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

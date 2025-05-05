@@ -3,17 +3,27 @@ import 'package:binance_mobile/presentations/screens/detail_page/detail_page.dar
 import 'package:binance_mobile/presentations/screens/home_page/crypto_list_widget.dart';
 import 'package:binance_mobile/presentations/screens/market_page/market_home.dart';
 import 'package:binance_mobile/presentations/screens/trade_page/trade_home.dart';
+import 'package:binance_mobile/presentations/screens/wallets_page/wallets_home.dart';
 import 'package:binance_mobile/presentations/widgets/error/error_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+final selectedIndexProvider = StateProvider<int>((ref) => 0);
 
 class HomePage extends ConsumerWidget {
   HomePage({super.key});
+
+  final selectedIndexProvider = StateProvider<int>((ref) => 0);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final appLocalizations = AppLocalizations.of(context)!;
-    // final selectedIndex = ref.watch(selectedIndexProvider);
+    // ignore: unused_local_variable
+    final appLocalizations = AppLocalizations.of(context)!;
+
+    // ignore: unused_local_variable
+    final selectedIndex = ref.watch(selectedIndexProvider);
+
     final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: SingleChildScrollView(
@@ -35,29 +45,29 @@ class HomePage extends ConsumerWidget {
                 child: Text("Go to Detail Page"),
               ),
             ),
-            
+
             _buildHeader(screenSize),
             _buildBalanceSection(screenSize, context),
             _buildQuickActions(screenSize),
             _buildMarketTabs(screenSize, ref),
             _buildMarketFilters(screenSize),
-            // _buildHeaderCryptoItem(screenSize),
-            // _buildMarketList(screenSize, ref),
-            // Center(
-            //   child: Padding(
-            //     padding:
-            //         EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
-            //     child: const Text(
-            //       'View More',
-            //       style: TextStyle(
-            //         fontSize: 14,
-            //         color: Color(0xFFFF8F00),
-            //         fontWeight: FontWeight.w500,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // _buildDiscoveryTabs(screenSize),
+            _buildHeaderCryptoItem(screenSize),
+            _buildMarketList(screenSize, ref),
+            Center(
+              child: Padding(
+                padding:
+                    EdgeInsets.symmetric(vertical: screenSize.height * 0.015),
+                child: const Text(
+                  'View More',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFFF8F00),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            _buildDiscoveryTabs(screenSize),
           ],
         ),
       ),
@@ -254,7 +264,7 @@ class HomePage extends ConsumerWidget {
               // shape: BoxShape.circle,
               border:
                   Border.all(color: Colors.grey.withOpacity(0.15), width: 1),
-              borderRadius: BorderRadius.all(Radius.circular(12))),
+              borderRadius: const BorderRadius.all(Radius.circular(12))),
           child: Icon(icon, size: 20, color: Colors.grey[700]),
         ),
         SizedBox(height: screenSize.height * 0.006),

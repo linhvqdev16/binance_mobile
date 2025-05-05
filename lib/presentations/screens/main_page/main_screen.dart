@@ -2,10 +2,15 @@ import 'package:binance_mobile/core/dependency_injection/injection_container.dar
 import 'package:binance_mobile/presentations/screens/home_page/home_page.dart';
 import 'package:binance_mobile/presentations/screens/market_page/market_home.dart';
 import 'package:binance_mobile/presentations/screens/trade_page/trade_home.dart';
+import 'package:binance_mobile/presentations/screens/wallets_page/wallets_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 class MainPage extends ConsumerWidget {
-  const MainPage({super.key});
+  MainPage({super.key});
+
+  final selectedIndexProvider = StateProvider<int>((ref) => 0);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
@@ -16,9 +21,7 @@ class MainPage extends ConsumerWidget {
       const Center(
         child: Text('Đây là màn Futures'),
       ),
-      const Center(
-        child: Text('Đây là màn tài sản'),
-      ),
+      const WalletsHome()
     ];
     return Scaffold(
       body: _screens[selectedIndex],

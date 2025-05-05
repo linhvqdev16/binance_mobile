@@ -42,3 +42,12 @@ final favoriteProvider =
     ],
   ),
 );
+
+final alphaProvider =
+    StateNotifierProvider<MarketTickerNotifier, MarketTickerState>(
+  (ref) => MarketTickerNotifier(
+    watchlist: [
+      'BITCOINUSDT',
+    ],
+  ),
+);

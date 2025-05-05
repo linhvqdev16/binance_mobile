@@ -38,11 +38,10 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
 
   @override
   void dispose() {
-    Future.delayed(Duration.zero, () {
-      final container =
-          ProviderContainer(); // Đảm bảo rằng chúng ta gọi disconnect() sau khi dispose của widget
-      container.read(websocketConnectionProvider.notifier).disconnect();
-    });
+    // Future.delayed(Duration.zero, () {
+    //   final container = ProviderContainer();
+    //   container.read(websocketConnectionProvider.notifier).disconnect();
+    // });
     _tabController.dispose();
     super.dispose();
   }

@@ -24,7 +24,7 @@ class CryptoItemWidget extends StatelessWidget {
     final String changeSign = ticker.percentChange >= 0 ? '+' : '';
     return GestureDetector(
       onTap: () => {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => CoinDetailScreen(symbol: ticker.symbol)),

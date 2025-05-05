@@ -54,6 +54,8 @@ dependencies:
   candlesticks: ^2.1.0
   deriv_chart: ^0.3.8
   k_chart_plus: ^1.0.2
+  dropdown_button2: ^2.0.0
+  # freezed: ^2.4.5
 
 dev_dependencies:
   flutter_test:
@@ -85,11 +87,15 @@ flutter:
      - .env
      - assets/images/
      - assets/icons/
-     - assets/fonts/IBMPFonts/
+     - assets/fonts/
   fonts:
-     - family: IBMPFonts
+     - family: Roboto
        fonts:
-         - asset: assets/fonts/IBMPFonts/Binance PLEX.ttf
+         - asset: assets/fonts/Roboto-Regular.ttf
+         - asset: assets/fonts/Roboto-Medium.ttf
+           weight: 500
+         - asset: assets/fonts/Roboto-Bold.ttf
+           weight: 700
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

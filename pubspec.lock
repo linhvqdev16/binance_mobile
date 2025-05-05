@@ -210,10 +210,10 @@ packages:
     dependency: "direct main"
     description:
       name: deriv_chart
-      sha256: "4f36936fca3332b30d0f6f311cc466b58b6141ec4eccb800476a90c583b6356a"
+      sha256: "9372907218d4a4dd853dcdfc72a4b38aaef1ff7c2396cb2f583f4f4455886ae3"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.8"
+    version: "0.3.9"
   deriv_technical_analysis:
     dependency: transitive
     description:
@@ -222,6 +222,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  dropdown_button2:
+    dependency: "direct main"
+    description:
+      name: dropdown_button2
+      sha256: b0fe8d49a030315e9eef6c7ac84ca964250155a6224d491c1365061bc974a9e1
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.9"
   equatable:
     dependency: "direct main"
     description:
@@ -606,10 +614,10 @@ packages:
     dependency: transitive
     description:
       name: provider
-      sha256: "489024f942069c2920c844ee18bb3d467c69e48955a4f32d1677f71be103e310"
+      sha256: "4abbd070a04e9ddc287673bf5a030c7ca8b685ff70218720abab8b092f53dd84"
       url: "https://pub.dev"
     source: hosted
-    version: "6.1.4"
+    version: "6.1.5"
   pub_semver:
     dependency: transitive
     description:
