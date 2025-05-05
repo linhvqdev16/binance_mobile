@@ -24,9 +24,9 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
 
   void addDigit(String digit) {
     setState(() {
-      if (digit == ',' && amount.contains(',')) return;
-      if (amount.isEmpty && digit == ',') {
-        amount = '0,';
+      if (digit == '.' && amount.contains('.')) return;
+      if (amount.isEmpty && digit == '.') {
+        amount = '0.';
       } else {
         amount += digit;
       }
@@ -138,9 +138,10 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                     child: Text(
                       'Danh sách tiền mã hóa',
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Roboto',
+                          color: Colors.black87),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -159,13 +160,18 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                           Icon(
                             Icons.search,
                             color: Colors.grey.shade500,
-                            size: 10,
+                            size: 20,
                           ),
                           const SizedBox(width: 8),
                           const Expanded(
                             child: TextField(
                               decoration: InputDecoration(
                                 hintText: 'Tìm',
+                                hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.bold),
                                 border: InputBorder.none,
                                 contentPadding:
                                     EdgeInsets.symmetric(vertical: 10),
@@ -179,9 +185,10 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                             child: const Text(
                               'Huỷ bỏ',
                               style: TextStyle(
-                                color: Colors.amber,
-                                fontWeight: FontWeight.w500,
-                              ),
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Roboto',
+                                  fontSize: 14),
                             ),
                           ),
                         ],
@@ -196,9 +203,9 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                     child: Text(
                       'Tất cả tiền mã hóa',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Roboto'),
                     ),
                   ),
 
@@ -214,6 +221,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                             final crypto = cryptoList[index];
                             return ListTile(
                               leading: CircleAvatar(
+                                radius: 16,
                                 backgroundColor: crypto['iconColor'],
                                 child:
                                     Icon(crypto['icon'], color: Colors.white),
@@ -223,8 +231,9 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                                   Text(
                                     crypto['symbol'],
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Roboto',
+                                        fontSize: 16),
                                   ),
                                   const SizedBox(width: 4),
                                   if (crypto['isVerified'])
@@ -232,7 +241,13 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                                         color: Colors.amber, size: 16),
                                 ],
                               ),
-                              subtitle: Text(crypto['name']),
+                              subtitle: Text(
+                                crypto['name'],
+                                style: const TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: 12.5,
+                                    color: Colors.grey),
+                              ),
                               onTap: () {
                                 this.setState(() {
                                   selectedCrypto = crypto['symbol'];
@@ -286,7 +301,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                                   .map((letter) => Text(
                                         letter,
                                         style: TextStyle(
-                                          fontSize: 10,
+                                          fontSize: 13,
                                           color: Colors.grey.shade600,
                                         ),
                                       ))
@@ -329,7 +344,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
               buildNumberRow(['1', '2', '3']),
               buildNumberRow(['4', '5', '6']),
               buildNumberRow(['7', '8', '9']),
-              buildNumberRow([',', '0', 'backspace']),
+              buildNumberRow(['.', '0', 'backspace']),
             ],
           ),
         ),

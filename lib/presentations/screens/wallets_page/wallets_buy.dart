@@ -12,9 +12,9 @@ class _WalletsBuyState extends State<WalletsBuy> {
 
   void addDigit(String digit) {
     setState(() {
-      if (digit == ',' && amount.contains(',')) return;
-      if (amount.isEmpty && digit == ',') {
-        amount = '0,';
+      if (digit == '.' && amount.contains('.')) return;
+      if (amount.isEmpty && digit == '.') {
+        amount = '0.';
       } else {
         amount += digit;
       }
@@ -44,7 +44,7 @@ class _WalletsBuyState extends State<WalletsBuy> {
                 buildNumberRow(['1', '2', '3']),
                 buildNumberRow(['4', '5', '6']),
                 buildNumberRow(['7', '8', '9']),
-                buildNumberRow([',', '0', 'backspace']),
+                buildNumberRow(['.', '0', 'backspace']),
               ],
             ),
             const SizedBox(height: 16),

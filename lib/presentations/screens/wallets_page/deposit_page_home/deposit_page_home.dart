@@ -1,4 +1,5 @@
 import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/depositAED.dart';
+import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/depositCrypto.dart';
 import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/depositP2P.dart';
 import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/depositPay.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +100,13 @@ class _DipositPageHomeState extends ConsumerState<DipositPageHome>
                   imagePath: 'assets/images/lock.png',
                   title: 'Nạp tiền mã hóa',
                   subtitle: 'Gửi tiền mã hóa đến Tài khoản Binance của bạn',
-                  onTap: () => {}),
+                  onTap: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DepositCryptoPage()),
+                        )
+                      }),
             ],
           ),
         ),
