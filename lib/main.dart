@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:binance_mobile/data/datasources/local/shared_preferences.dart';
-import 'package:binance_mobile/presentations/screens/detail_page/detail_page.dart';
 import 'package:binance_mobile/presentations/screens/login_page/login_page.dart';
+import 'package:binance_mobile/presentations/screens/main_page/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -87,7 +89,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       key: navigatorKey,
       locale: _locale,
-      theme: ThemeData(fontFamily: 'IBMPFonts',  scaffoldBackgroundColor: Colors.white, ),
+      theme: ThemeData(fontFamily: Platform.isIOS ? 'Roboto' : null,  scaffoldBackgroundColor: Colors.white, ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -98,7 +100,7 @@ class _MyAppState extends State<MyApp> {
         Locale('vi'),
         Locale('en'),
       ],
-      home: const CoinDetailScreen(symbol: 'BTC/USDT'),
+      home: MainPage(),
     );
   }
 }

@@ -1,10 +1,11 @@
+import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CoinPriceHeader extends ConsumerWidget {
   final String symbol;
 
-  CoinPriceHeader({super.key, required this.symbol});
+  const CoinPriceHeader({super.key, required this.symbol});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,7 +19,9 @@ class CoinPriceHeader extends ConsumerWidget {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      },
                     child: Image.asset(
                       'assets/icons/left_arrow.png',
                       width: 25,

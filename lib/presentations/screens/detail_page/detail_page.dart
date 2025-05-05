@@ -1,12 +1,9 @@
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/core/styles/colors.dart';
-import 'package:binance_mobile/data/models/models/market_data_model.dart';
-import 'package:binance_mobile/presentations/provider/detail_page_provider/websocket_provider.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/coin_price_header.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/indicator_tabs.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/order_book.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/time_view_selected.dart';
-import 'package:binance_mobile/presentations/screens/detail_page/trading_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -33,14 +30,19 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(websocketConnectionProvider.notifier).connect(widget.symbol);
+      if (context.mounted) {
+        ref.read(websocketConnectionProvider.notifier).connect(widget.symbol);
+      }
     });
   }
 
   @override
   void dispose() {
+    // Future.delayed(Duration.zero, () {
+    //   final container = ProviderContainer();
+    //   container.read(websocketConnectionProvider.notifier).disconnect();
+    // });
     _tabController.dispose();
-    ref.read(websocketConnectionProvider.notifier).disconnect();
     super.dispose();
   }
 
@@ -55,14 +57,20 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
             CoinPriceHeader(symbol: widget.symbol),
             Align(
               alignment: Alignment.centerLeft,
-              child: Container(decoration: BoxDecoration(border: Border( bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 0.1))),
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: Colors.grey.withOpacity(0.1), width: 0.1))),
                 width: MediaQuery.of(context).size.width,
                 child: TabBar(
                   controller: _tabController,
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                  labelPadding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                   labelColor: Colors.black,
                   isScrollable: true, // add this property
-                  unselectedLabelColor: const Color(0xff585861).withOpacity(0.4),
+                  unselectedLabelColor:
+                      const Color(0xff585861).withOpacity(0.4),
                   indicatorColor: Colors.amber,
                   indicatorSize: TabBarIndicatorSize.label,
                   labelStyle: const TextStyle(fontWeight: FontWeight.w500),
@@ -140,7 +148,7 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                       Text(
+                      Text(
                         '$priceText \$',
                         style: const TextStyle(
                           fontSize: 14,
@@ -172,78 +180,80 @@ class _CoinDetailScreenState extends ConsumerState<CoinDetailScreen>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                     Row(
-                       mainAxisAlignment: MainAxisAlignment.start,
-                       children: [
-                         Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             const Text(
-                               'Giá cao nhất 24h',
-                               style: TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.grey),
-                             ),
-                              Text(
-                               priceText,
-                               style: const TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.black),
-                             ),
-                             const Text(
-                               'Giá thấp nhất 24h',
-                               style: TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.grey),
-                             ),
-                             Text(
-                               priceText,
-                               style: const TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.black),
-                             ),
-                           ],
-                         ),
-                         const SizedBox(width: 10,),
-                         Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             const Text(
-                               'KL 24h(BTC)',
-                               style: TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.grey),
-                             ),
-                             Text(
-                               priceText,
-                               style: const TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.black),
-                             ),
-                             const Text(
-                               'KL 24h(USDT)',
-                               style: TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.grey),
-                             ),
-                             Text(
-                               priceText,
-                               style: const TextStyle(
-                                   fontSize: 12,
-                                   fontWeight: FontWeight.normal,
-                                   color: Colors.black),
-                             ),
-                           ],
-                         )
-                       ],
-                     )
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Giá cao nhất 24h',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey),
+                            ),
+                            Text(
+                              priceText,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black),
+                            ),
+                            const Text(
+                              'Giá thấp nhất 24h',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey),
+                            ),
+                            Text(
+                              priceText,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'KL 24h(BTC)',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey),
+                            ),
+                            Text(
+                              priceText,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black),
+                            ),
+                            const Text(
+                              'KL 24h(USDT)',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey),
+                            ),
+                            Text(
+                              priceText,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        )
+                      ],
+                    )
                   ],
                 )
               ],
