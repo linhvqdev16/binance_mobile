@@ -132,6 +132,15 @@ class HomePage extends ConsumerWidget {
     );
   }
 
+  Widget buildHeaders(Size scr) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.amber,
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          border: Border.all()),
+    );
+  }
+
   Widget _buildHeader(Size screenSize) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -322,7 +331,7 @@ class HomePage extends ConsumerWidget {
               // shape: BoxShape.circle,
               border:
                   Border.all(color: Colors.grey.withOpacity(0.15), width: 1),
-              borderRadius: BorderRadius.all(Radius.circular(12))),
+              borderRadius: const BorderRadius.all(Radius.circular(12))),
           child: Icon(icon, size: 20, color: Colors.grey[700]),
         ),
         SizedBox(height: screenSize.height * 0.006),
