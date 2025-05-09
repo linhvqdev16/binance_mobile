@@ -30,21 +30,20 @@ class HomePage extends ConsumerWidget {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Chuyển đến màn hình DetailPage khi bấm nút
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CoinDetailScreen(symbol: 'btc/usdt'),
-                    ),
-                  );
-                },
-                child: Text("Go to Detail Page"),
-              ),
-            ),
+            // Center(
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       // Chuyển đến màn hình DetailPage khi bấm nút
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => CoinDetailScreen(symbol: 'btc/usdt'),
+            //         ),
+            //       );
+            //     },
+            //     child: Text("Go to Detail Page"),
+            //   ),
+            // ),
 
             _buildHeader(screenSize),
             _buildBalanceSection(screenSize, context),

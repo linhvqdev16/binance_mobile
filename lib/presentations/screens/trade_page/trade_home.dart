@@ -11,8 +11,11 @@ class TradeHome extends ConsumerStatefulWidget {
 class _TradeHomeState extends ConsumerState<TradeHome>
     with SingleTickerProviderStateMixin {
   final selectedIndexProvider = StateProvider<int>((ref) => 0);
+  final selectedTabIndexProvider = StateProvider<int>((ref) => 0);
   final isBuySelectedProvider = StateProvider<bool>((ref) => true);
   bool isBuySelected = true;
+  late final int currentStep = 0;
+  late final int totalSteps = 5;
   List<String> danhSachGia = [
     '92.745.69',
     '92.745.67',
@@ -34,7 +37,6 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-
     return SafeArea(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -181,27 +183,47 @@ class _TradeHomeState extends ConsumerState<TradeHome>
         horizontal: screenSize.width * 0.03,
         vertical: screenSize.height * 0.01,
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-              flex: 3,
-              child: Column(
-                children: [
-                  _buildPriceQuantityHeader(screenSize),
-                  const SizedBox(height: 5),
-                  _buildMainPrice(),
-                  _buildSubPrice(),
-                  _buildPriceQuantityBody(screenSize),
-                  const SizedBox(height: 5),
-                  _buildBottomRow(),
-                ],
-              )),
-          SizedBox(width: screenSize.width * 0.03),
-          Expanded(
-              flex: 4,
-              child: Column(
-                children: [_buildButtonBuySell(screenSize)],
-              ))
+          Row(
+            children: [
+              Expanded(
+                  flex: 3,
+                  child: Column(
+                    children: [
+                      _buildPriceQuantityHeader(screenSize),
+                      SizedBox(height: screenSize.height * 0.005),
+                      _buildMainPrice(),
+                      _buildSubPrice(),
+                      _buildPriceQuantityBody(screenSize),
+                      SizedBox(height: screenSize.height * 0.005),
+                      _buildBottomRow(),
+                    ],
+                  )),
+              SizedBox(width: screenSize.width * 0.03),
+              Expanded(
+                  flex: 4,
+                  child: Column(
+                    children: [
+                      _buildButtonBuySell(screenSize),
+                      SizedBox(height: screenSize.height * 0.01),
+                      _buildButtonLimit(screenSize),
+                      SizedBox(height: screenSize.height * 0.01),
+                      _buildButtonPriceUSDT(screenSize),
+                      SizedBox(height: screenSize.height * 0.01),
+                      _buildButtonQuantityBTC(screenSize),
+                      SizedBox(height: screenSize.height * 0.01),
+                      _buildStepper(screenSize),
+                      SizedBox(height: screenSize.height * 0.02),
+                      _buildButtonTotalUSDT(screenSize),
+                      SizedBox(height: screenSize.height * 0.01),
+                      _buildTP_SL(screenSize),
+                    ],
+                  ))
+            ],
+          ),
+          SizedBox(height: screenSize.height * 0.01),
+          _buildTradeTabs(screenSize)
         ],
       ),
     );
@@ -454,6 +476,334 @@ class _TradeHomeState extends ConsumerState<TradeHome>
       ],
     );
   }
+
+  Widget _buildButtonLimit(Size screenSize) {
+    return Container(
+      height: 27,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+          color: Color(0xfff5f5f5),
+          borderRadius: BorderRadius.all(Radius.circular(7))),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(
+              Icons.info_sharp,
+              size: 18,
+              color: Colors.grey,
+            ),
+            Text(
+              'Limit',
+              style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.black,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold),
+            ),
+            Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtonPriceUSDT(Size screenSize) {
+    return Container(
+      height: 37,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+          color: Color(0xfff5f5f5),
+          borderRadius: BorderRadius.all(Radius.circular(7))),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(
+              Icons.remove,
+              size: 18,
+              color: Colors.grey,
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  'Giá (USDT)',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  '103685.81',
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.black,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Icon(Icons.add, size: 20, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtonQuantityBTC(Size screenSize) {
+    return Container(
+      height: 37,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+          color: Color(0xfff5f5f5),
+          borderRadius: BorderRadius.all(Radius.circular(7))),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(
+              Icons.remove,
+              size: 18,
+              color: Colors.grey,
+            ),
+            Text(
+              'Số lượng (BTC)',
+              style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w500),
+            ),
+            Icon(Icons.add, size: 20, color: Colors.grey)
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepper(Size screenSize) {
+    return Row(
+      children: List.generate(totalSteps * 2 - 1, (index) {
+        if (index.isOdd) {
+          // Vẽ đường kẻ giữa các bước
+          return Expanded(
+            child: Container(
+              height: 1,
+              color: Colors.grey.shade300,
+            ),
+          );
+        } else {
+          int stepIndex = index ~/ 2;
+          bool isActive = stepIndex == currentStep;
+          return CustomPaint(
+            size: const Size(15, 15),
+            painter: DiamondPainter(isActive: isActive),
+          );
+        }
+      }),
+    );
+  }
+
+  Widget _buildButtonTotalUSDT(Size screenSize) {
+    return Container(
+      height: 37,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+          color: Color(0xfff5f5f5),
+          borderRadius: BorderRadius.all(Radius.circular(7))),
+      child: const Center(
+        child: Text(
+          'Tổng (USDT)',
+          style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTP_SL(Size screenSize) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                height: 15,
+                width: 15,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: const BorderRadius.all(Radius.circular(3))),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              const Text(
+                'TP/SL',
+                style: TextStyle(color: Colors.black, fontSize: 14),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 7,
+          ),
+          Row(
+            children: [
+              Container(
+                height: 15,
+                width: 15,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: const BorderRadius.all(Radius.circular(3))),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              const Text(
+                'Tảng băng',
+                style: TextStyle(color: Colors.black, fontSize: 14),
+              )
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Khả dụng',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+              Row(
+                children: [
+                  Text(
+                    '0 USDT',
+                    style: TextStyle(color: Colors.black, fontSize: 13),
+                  ),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Icon(
+                    Icons.add_circle,
+                    color: Colors.orange,
+                    size: 19,
+                  )
+                ],
+              )
+            ],
+          ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Mua tối đa',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 13,
+                ),
+              ),
+              Text(
+                '0,00000 BTC',
+                style: TextStyle(color: Colors.black, fontSize: 13),
+              ),
+            ],
+          ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Phí dự kiến',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+              Text(
+                '-- BTC',
+                style: TextStyle(color: Colors.black, fontSize: 13),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Container(
+            height: 37,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+                color: Color(0xFF25C26E),
+                borderRadius: BorderRadius.all(Radius.circular(7))),
+            child: const Center(
+              child: Text(
+                'Mua BTC',
+                style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTradeTabs(Size screenSize) {
+    return Container(
+      padding: EdgeInsets.only(top: screenSize.height * 0.015),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            SizedBox(width: screenSize.width * 0.02),
+            _buildTabText('Lệnh chờ (0)', index: 0, ref: ref),
+            _buildTabText('Tài sản(2)', index: 1, ref: ref),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabText(String text,
+      {bool isSelected = false, int index = 0, WidgetRef? ref}) {
+    final isSelected = ref?.watch(selectedTabIndexProvider) == index;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: GestureDetector(
+        onTap: () =>
+            {ref?.read(selectedTabIndexProvider.notifier).state = index},
+        child: Column(
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 14,
+                color: ref?.watch(selectedTabIndexProvider) == index
+                    ? Colors.black
+                    : Colors.grey[500],
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              height: 2,
+              width: 24,
+              color: ref?.watch(selectedTabIndexProvider) == index
+                  ? const Color(0xFFFFC107)
+                  : Colors.transparent,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 //cắt góc hình tam giác
@@ -489,4 +839,31 @@ class LeftTriangleClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+//class stepper
+class DiamondPainter extends CustomPainter {
+  final bool isActive;
+
+  DiamondPainter({required this.isActive});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = isActive ? Colors.black : Colors.grey.shade300
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = isActive ? 1.5 : 1;
+
+    final path = Path();
+    path.moveTo(size.width / 2, 0); // top
+    path.lineTo(size.width, size.height / 2); // right
+    path.lineTo(size.width / 2, size.height); // bottom
+    path.lineTo(0, size.height / 2); // left
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

@@ -132,7 +132,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                       ),
                     ),
                   ),
-
+                  const SizedBox(height: 15),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
@@ -152,7 +152,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Row(
@@ -319,6 +319,247 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
         );
       },
     );
+  }
+
+  void _showPaymentMethod() {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.9,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.only(top: 16, bottom: 8),
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'Phương thức thanh toán',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Roboto',
+                          color: Colors.black87),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Được đề xuất',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          'Giá',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w500),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Material(
+                      color: Colors.white,
+                      // borderRadius: BorderRadius.circular(15),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(15),
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 14),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 1.5,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Row(
+                            children: [
+                              Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  Icon(Icons.account_balance,
+                                      color: Colors.black, size: 24),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Icon(Icons.circle,
+                                        size: 8, color: Colors.amber),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Chuyển khoản ngân hàng',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15.5,
+                                      fontFamily: 'Roboto'),
+                                ),
+                              ),
+                              Text(
+                                '3,84 AED',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Khác',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          'Giá',
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w500),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Material(
+                      color: Colors.white,
+                      // borderRadius: BorderRadius.circular(15),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(15),
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 14),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/visa.png',
+                                height: 25,
+                                width: 25,
+                                fit: BoxFit.cover,
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Text(
+                                  'Thẻ (VISA/MasterCard)',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15.5,
+                                      fontFamily: 'Roboto'),
+                                ),
+                              ),
+                              const Text(
+                                '3,79 AED',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {},
+                        child: Container(
+                          height: 55,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: const Color(0xfffad65f),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Xác nhận',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 17,
+                                fontFamily: 'Roboto'),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                ],
+              ),
+            );
+          });
+        });
   }
 
   @override
@@ -494,9 +735,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
               Text(
                 '0 USDT',
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
+                    fontSize: 16, color: Colors.black, fontFamily: 'Roboto'),
               ),
             ],
           ),
@@ -524,19 +763,17 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
           title: const Text(
             'Mua',
             style: TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-            ),
+                color: Colors.grey, fontSize: 14, fontFamily: 'Roboto'),
           ),
           subtitle: Row(
             children: [
               Text(
                 selectedCrypto,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontFamily: 'Roboto'),
               ),
               const SizedBox(width: 4),
               const Icon(Icons.verified, color: Colors.amber, size: 16),
@@ -563,21 +800,20 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
         ),
       ),
       child: ListTile(
+        onTap: _showPaymentMethod,
         leading: const Icon(Icons.account_balance, color: Colors.black),
         title: const Text(
           'Thanh toán bằng',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
+          style:
+              TextStyle(color: Colors.grey, fontSize: 14, fontFamily: 'Roboto'),
         ),
         subtitle: const Text(
           'Chuyển khoản ngân hàng',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Colors.black,
-          ),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Colors.black,
+              fontFamily: 'Roboto'),
         ),
         trailing: Icon(
           Icons.chevron_right,
