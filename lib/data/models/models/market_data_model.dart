@@ -6,6 +6,7 @@ class MarketDataModel {
   final double low24h;
   final double volume24h;
   final DateTime lastUpdated;
+  final double openPrice;
 
   MarketDataModel({
     required this.price,
@@ -15,6 +16,7 @@ class MarketDataModel {
     required this.low24h,
     required this.volume24h,
     required this.lastUpdated,
+    required this.openPrice
   });
 
   MarketDataModel copyWith({
@@ -25,6 +27,7 @@ class MarketDataModel {
     double? low24h,
     double? volume24h,
     DateTime? lastUpdated,
+    double? openPrice
   }) {
     return MarketDataModel(
       price: price ?? this.price,
@@ -34,6 +37,7 @@ class MarketDataModel {
       low24h: low24h ?? this.low24h,
       volume24h: volume24h ?? this.volume24h,
       lastUpdated: lastUpdated ?? this.lastUpdated,
+      openPrice: openPrice ?? this.openPrice
     );
   }
 }

@@ -52,6 +52,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       low24h: 0.0,
       volume24h: 0.0,
       lastUpdated: DateTime.now(),
+      openPrice: 0
     ),
     marketPercentModel: MarketPercentModel(
       y1: 0.0,
@@ -104,7 +105,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   void _subscribeToStreams(String symbol) {
     final String symbolLower = symbol.replaceAll('/', '').toLowerCase();
     _webSocket?.subscribe([
-      "$symbolLower@trade",
+      "$symbolLower@ticker",
       "$symbolLower@depth300@100ms",
       "$symbolLower@kline_1m",
     ]);
@@ -120,7 +121,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
     if (data.containsKey('e')) {
       final eventType = data['e'];
       switch (eventType) {
-        case 'trade':
+        case '24hrTicker':
           _handleTradeEvent(data);
           break;
         case 'depthUpdate':
@@ -202,9 +203,14 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   }
 
   void _handleTradeEvent(Map<String, dynamic> data) {
-    final price = double.parse(data['p']);
+    final price = double.parse(data['c']);
     final updatedMarketData = state.marketData.copyWith(
       price: price,
+      priceChange: double.parse(data['p']),
+      priceChangePercent: double.parse(data['P']),
+      openPrice: double.parse(data['o']),
+      high24h: double.parse(data['h']),
+      low24h: double.parse(data['l']),
       lastUpdated: DateTime.now(),
     );
     state = state.copyWith(marketData: updatedMarketData);

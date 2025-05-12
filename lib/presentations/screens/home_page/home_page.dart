@@ -10,6 +10,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final selectedIndexProvider = StateProvider<int>((ref) => 0);
+final selectedCoinItemProvider = StateProvider<int>((ref) => 3);
+
 
 class HomePage extends ConsumerWidget {
   HomePage({super.key});
@@ -18,10 +20,7 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ignore: unused_local_variable
     final appLocalizations = AppLocalizations.of(context)!;
-
-    // ignore: unused_local_variable
     final selectedIndex = ref.watch(selectedIndexProvider);
 
     final screenSize = MediaQuery.of(context).size;
@@ -30,21 +29,6 @@ class HomePage extends ConsumerWidget {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            // Center(
-            //   child: ElevatedButton(
-            //     onPressed: () {
-            //       // Chuyển đến màn hình DetailPage khi bấm nút
-            //       Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //           builder: (context) => CoinDetailScreen(symbol: 'btc/usdt'),
-            //         ),
-            //       );
-            //     },
-            //     child: Text("Go to Detail Page"),
-            //   ),
-            // ),
-
             _buildHeader(screenSize),
             _buildBalanceSection(screenSize, context),
             _buildQuickActions(screenSize),

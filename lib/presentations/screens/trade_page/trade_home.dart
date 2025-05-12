@@ -1,7 +1,12 @@
+import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/core/styles/colors.dart';
+import 'package:binance_mobile/data/models/models/market_data_model.dart';
+import 'package:binance_mobile/data/models/models/order_book_data.dart';
+import 'package:binance_mobile/presentations/screens/detail_page/order_book.dart';
 import 'package:binance_mobile/presentations/widgets/popup/coin_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class TradeHome extends ConsumerStatefulWidget {
   const TradeHome({super.key});
@@ -9,6 +14,7 @@ class TradeHome extends ConsumerStatefulWidget {
   @override
   ConsumerState<TradeHome> createState() => _TradeHomeState();
 }
+final numberFormat = NumberFormat("#,##0.0", "en_US");
 
 class _TradeHomeState extends ConsumerState<TradeHome>
     with SingleTickerProviderStateMixin {
@@ -36,17 +42,31 @@ class _TradeHomeState extends ConsumerState<TradeHome>
     '0,00012',
     '0,06057',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        ref.read(websocketConnectionProvider.notifier).connect("btc/usdt");
+        ref.read(websocketBidsAskProvider.notifier).connect("btc/usdt");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final marketData = ref.watch(marketDataProvider);
+    final orderBook = ref.watch(orderBookProvider);
     return SafeArea(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
             _buildHeader(screenSize),
-            _buildDropdown(screenSize),
-            _buildBody(screenSize)
+            _buildDropdown(screenSize, marketData),
+            _buildBody(screenSize, orderBook, marketData)
           ],
         ),
       ),
@@ -111,7 +131,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   }
 
   //drop down menu
-  Widget _buildDropdown(Size screenSize) {
+  Widget _buildDropdown(Size screenSize, MarketDataModel model) {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: screenSize.width * 0.03,
@@ -155,10 +175,10 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                   ],
                 ),
               ),
-              const Text(
-                '-0.36%',
+               Text(
+                "${model.priceChangePercent.toStringAsFixed(2)} %",
                 style: TextStyle(
-                  color: Colors.red,
+                  color: model.priceChangePercent < 0 ?  ColorStyle.redColor : ColorStyle.greenColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -189,7 +209,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   }
 
   //body: Giá + Số lượng
-  Widget _buildBody(Size screenSize) {
+  Widget _buildBody(Size screenSize, OrderBookData orderBook, MarketDataModel model) {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: screenSize.width * 0.03,
@@ -203,11 +223,11 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                   flex: 3,
                   child: Column(
                     children: [
-                      _buildPriceQuantityHeader(screenSize),
+                      _buildPriceQuantityHeader(screenSize, orderBook),
                       SizedBox(height: screenSize.height * 0.005),
-                      _buildMainPrice(),
-                      _buildSubPrice(),
-                      _buildPriceQuantityBody(screenSize),
+                      _buildMainPrice(model),
+                      _buildSubPrice(model),
+                      _buildPriceQuantityBody(screenSize, orderBook),
                       SizedBox(height: screenSize.height * 0.005),
                       _buildBottomRow(),
                     ],
@@ -221,7 +241,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       SizedBox(height: screenSize.height * 0.01),
                       _buildButtonLimit(screenSize),
                       SizedBox(height: screenSize.height * 0.01),
-                      _buildButtonPriceUSDT(screenSize),
+                      _buildButtonPriceUSDT(screenSize, model),
                       SizedBox(height: screenSize.height * 0.01),
                       _buildButtonQuantityBTC(screenSize),
                       SizedBox(height: screenSize.height * 0.01),
@@ -242,92 +262,132 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   }
 
   //Cột bên trái
-  Widget _buildPriceQuantityHeader(Size screenSize) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildPriceQuantityHeader(Size screenSize, OrderBookData orderBook) {
+    return Column(
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Giá',
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            const Text('(USDT)',
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 5),
-            ...danhSachGia.map((price) => Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: screenSize.height * 0.001),
-                  child: Text(price,
-                      style: const TextStyle(fontSize: 13, color: Colors.red)),
-                ))
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Giá',
+                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('(USDT)',
+                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                SizedBox(height: 5)
+              ],
+            ),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('Số lượng',
+                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('(BTC)',
+                    style: TextStyle(color: Colors.grey, fontSize: 12))
+              ],
+            ),
           ],
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            const Text('Số lượng',
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            const Text('(BTC)',
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            ...danhSachSoLuong.map((sl) => Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: screenSize.height * 0.001),
-                  child: Text(sl,
-                      style:
-                          const TextStyle(fontSize: 13, color: Colors.black)),
-                ))
-          ],
+         SizedBox(
+          height: MediaQuery.of(context).size.width * 0.31,
+          child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: orderBook.asks.take(7).length,
+            itemBuilder: (context, index) {
+              final ask = orderBook.asks.take(7).toList()[index];
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+
+                  Container(
+                    height: 20,
+                    alignment: Alignment.center,
+                    child: Text(
+                      numberFormat.format(ask.price ?? 0),
+                      style: const TextStyle(
+                        color: ColorStyle.redColor,
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+
+                  Container(
+                    height: 20,
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Text(
+                        (ask.quantity ?? 0).toStringAsFixed(5),
+                        style: const TextStyle(fontSize: 12),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildPriceQuantityBody(Size screenSize) {
-    return Container(
-      color: const Color(0xfff5fafa),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: danhSachGia
-                .map((price) => Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: screenSize.height * 0.001),
-                      child: Text(price,
-                          style: const TextStyle(
-                              fontSize: 13, color: Color(0xFF25C26E))),
-                    ))
-                .toList(),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: danhSachSoLuong
-                .map((sl) => Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: screenSize.height * 0.001),
-                      child: Text(sl,
-                          style: const TextStyle(
-                              fontSize: 13, color: Colors.black)),
-                    ))
-                .toList(),
-          ),
-        ],
+  Widget _buildPriceQuantityBody(Size screenSize, OrderBookData orderBook) {
+    return  SizedBox(
+      height: MediaQuery.of(context).size.width * 0.31,
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: orderBook.bids.take(7).length,
+        itemBuilder: (context, index) {
+          final model = orderBook.bids.take(7).toList()[index];
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                height: 20,
+                alignment: Alignment.center,
+                child: Text(
+                  numberFormat.format(model.price ?? 0),
+                  style: const TextStyle(
+                    color: ColorStyle.greenColor,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+
+              Container(
+                height: 20,
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Text(
+                    (model.quantity ?? 0).toStringAsFixed(5),
+                    style: const TextStyle(fontSize: 12),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildMainPrice() {
-    return const Text(
-      '92.742,86',
-      style: TextStyle(
+  Widget _buildMainPrice(MarketDataModel model) {
+    return Text(
+      '${model.price ?? "0"}',
+      style: const TextStyle(
           color: Color(0xFF25C26E), fontSize: 17, fontWeight: FontWeight.bold),
     );
   }
 
-  Widget _buildSubPrice() {
+  Widget _buildSubPrice(MarketDataModel model) {
     return Text(
-      '≈ 92.742,86 \$',
+      '≈ ${model.price ?? "0"} \$',
       style: TextStyle(color: Colors.grey[500], fontSize: 13),
     );
   }
@@ -521,7 +581,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
     );
   }
 
-  Widget _buildButtonPriceUSDT(Size screenSize) {
+  Widget _buildButtonPriceUSDT(Size screenSize, MarketDataModel model) {
     return Container(
       height: 37,
       width: double.infinity,
@@ -530,10 +590,10 @@ class _TradeHomeState extends ConsumerState<TradeHome>
           borderRadius: BorderRadius.all(Radius.circular(7))),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
+            const Icon(
               Icons.remove,
               size: 18,
               color: Colors.grey,
@@ -541,7 +601,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(
+                const Text(
                   'Giá (USDT)',
                   style: TextStyle(
                     fontSize: 10,
@@ -549,8 +609,8 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                   ),
                 ),
                 Text(
-                  '103685.81',
-                  style: TextStyle(
+                  model.price.toStringAsFixed(2),
+                  style: const TextStyle(
                       fontSize: 13,
                       color: Colors.black,
                       fontFamily: 'Roboto',

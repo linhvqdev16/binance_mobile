@@ -34,16 +34,11 @@ class _OrderBookState extends ConsumerState<OrderBook>
   @override
   Widget build(BuildContext context) {
     final orderBook = ref.watch(orderBookProvider);
-    final totalBidQuantity =
-        orderBook.bids.fold<double>(0, (sum, entry) => sum + entry.quantity);
-    final totalAskQuantity =
-        orderBook.asks.fold<double>(0, (sum, entry) => sum + entry.quantity);
+    final totalBidQuantity =  orderBook.bids.fold<double>(0, (sum, entry) => sum + entry.quantity);
+    final totalAskQuantity = orderBook.asks.fold<double>(0, (sum, entry) => sum + entry.quantity);
     final totalQuantity = totalBidQuantity + totalAskQuantity;
-
-    final buyPercentage =
-        totalQuantity > 0 ? (totalBidQuantity / totalQuantity * 100) : 0.0;
+    final buyPercentage = totalQuantity > 0 ? (totalBidQuantity / totalQuantity * 100) : 0.0;
     final sellPercentage = 100 - buyPercentage;
-
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.7,
       child: Column(
