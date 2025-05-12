@@ -54,6 +54,7 @@ class HttpClient {
     return {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
+      'User-Agent': 'Mozilla/5.0'
     };
   }
 

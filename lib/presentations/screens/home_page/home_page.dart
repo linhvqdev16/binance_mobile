@@ -30,21 +30,20 @@ class HomePage extends ConsumerWidget {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Chuyển đến màn hình DetailPage khi bấm nút
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CoinDetailScreen(symbol: 'btc/usdt'),
-                    ),
-                  );
-                },
-                child: Text("Go to Detail Page"),
-              ),
-            ),
+            // Center(
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       // Chuyển đến màn hình DetailPage khi bấm nút
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => CoinDetailScreen(symbol: 'btc/usdt'),
+            //         ),
+            //       );
+            //     },
+            //     child: Text("Go to Detail Page"),
+            //   ),
+            // ),
 
             _buildHeader(screenSize),
             _buildBalanceSection(screenSize, context),
@@ -61,8 +60,8 @@ class HomePage extends ConsumerWidget {
                   'View More',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFFFF8F00),
-                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFFCD535),
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
@@ -218,13 +217,13 @@ class HomePage extends ConsumerWidget {
                   vertical: screenSize.height * 0.01,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFC107),
+                  color: const Color(0xFFFCD535),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
                   'Add Funds',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     fontSize: 14,
                   ),
                 ),

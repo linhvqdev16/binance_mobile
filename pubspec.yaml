@@ -55,6 +55,8 @@ dependencies:
   deriv_chart: ^0.3.8
   k_chart_plus: ^1.0.2
   dropdown_button2: ^2.0.0
+  json_annotation: ^4.9.0
+
   # freezed: ^2.4.5
 
 dev_dependencies:

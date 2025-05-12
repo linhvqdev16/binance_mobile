@@ -1,6 +1,7 @@
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/presentations/screens/home_page/home_page.dart';
 import 'package:binance_mobile/presentations/screens/market_page/market_home.dart';
+import 'package:binance_mobile/presentations/screens/detail_page/detail_page.dart';
 import 'package:binance_mobile/presentations/screens/trade_page/trade_home.dart';
 import 'package:binance_mobile/presentations/screens/wallets_page/wallets_home.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class MainPage extends ConsumerWidget {
       const Center(
         child: Text('Đây là màn Futures'),
       ),
+      // const CoinDetailScreen(symbol: 'btc/usdt'),
       const WalletsHome()
     ];
     return Scaffold(

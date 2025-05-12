@@ -1,3 +1,4 @@
+import 'package:binance_mobile/core/styles/colors.dart';
 import 'package:binance_mobile/data/models/models/market_ticker_model.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/detail_page.dart';
 import 'package:binance_mobile/presentations/service/home_usecase/market_ticker_provider.dart';
@@ -42,7 +43,7 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
   }
 
   Color _getChangeColor(double change) {
-    return change >= 0 ? const Color(0xFF25C26E) : const Color(0xFFF6465D);
+    return change >= 0 ? ColorStyle.greenColor : ColorStyle.redColor;
   }
 
   final selectedIndexProvider = StateProvider<int>((ref) => 0);

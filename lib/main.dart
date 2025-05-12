@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'core/languages/l10n_language_config.dart';
 import 'package:flutter/services.dart';
-
 import 'presentations/screens/home_page/home_page.dart';
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart'
     as di;
@@ -89,7 +88,10 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       key: navigatorKey,
       locale: _locale,
-      theme: ThemeData(fontFamily: Platform.isIOS ? 'Roboto' : null,  scaffoldBackgroundColor: Colors.white, ),
+      theme: ThemeData(
+        fontFamily: Platform.isIOS ? 'Roboto' : null,
+        scaffoldBackgroundColor: Colors.white,
+      ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
