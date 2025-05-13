@@ -1,9 +1,14 @@
+import 'package:binance_mobile/core/data/data_origin.dart';
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
 import 'package:binance_mobile/core/styles/colors.dart';
 import 'package:binance_mobile/data/models/models/market_data_model.dart';
 import 'package:binance_mobile/data/models/models/order_book_data.dart';
-import 'package:binance_mobile/presentations/screens/detail_page/order_book.dart';
+import 'package:binance_mobile/presentations/provider/provider_common.dart';
+import 'package:binance_mobile/presentations/widgets/popup/bid_form_popup.dart';
 import 'package:binance_mobile/presentations/widgets/popup/coin_bottom_sheet.dart';
+import 'package:binance_mobile/presentations/widgets/popup/coin_trading_type_popup.dart';
+import 'package:binance_mobile/presentations/widgets/popup/oco_limit_or_maket_popup.dart';
+import 'package:binance_mobile/presentations/widgets/popup/spot_type_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +19,10 @@ class TradeHome extends ConsumerStatefulWidget {
   @override
   ConsumerState<TradeHome> createState() => _TradeHomeState();
 }
+
 final numberFormat = NumberFormat("#,##0.0", "en_US");
+final selectedSpotTypeProvider = StateProvider<int>((ref) => 1);
+final selectedCoinTradingTypeProvider = StateProvider<int>((ref) => 1);
 
 class _TradeHomeState extends ConsumerState<TradeHome>
     with SingleTickerProviderStateMixin {
@@ -24,24 +32,57 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   bool isBuySelected = true;
   late final int currentStep = 0;
   late final int totalSteps = 5;
-  List<String> danhSachGia = [
-    '92.745.69',
-    '92.745.67',
-    '92.744.69',
-    '92.744.64',
-    '92.744.46',
-    '92.743.74',
-    '92.742.86',
-  ];
-  List<String> danhSachSoLuong = [
-    '0,00006',
-    '0,00096',
-    '0,00006',
-    '0,00006',
-    '0,00013',
-    '0,00012',
-    '0,06057',
-  ];
+
+  /// Tổng số coin
+  final TextEditingController _controllerTotalCoin = TextEditingController();
+  final FocusNode _focusNodeTotalCoin = FocusNode();
+
+  /// Stop Limit
+  final TextEditingController _controllerStopLimitStop =
+      TextEditingController();
+  final FocusNode _focusNodeStopLimitStop = FocusNode();
+  final TextEditingController _controllerStopLimitLimit =
+      TextEditingController();
+  final FocusNode _focusNodeStopLimitLimit = FocusNode();
+  final TextEditingController _controllerStopLimitQuantity =
+      TextEditingController();
+  final FocusNode _focusNodeStopLimitQuantity = FocusNode();
+
+  /// Stop Market
+  final TextEditingController _controllerStopMarketStop =
+      TextEditingController();
+  final FocusNode _focusNodeStopMarketStop = FocusNode();
+  final TextEditingController _controllerStopMarketLimit =
+      TextEditingController();
+  final FocusNode _focusNodeStopMarketLimit = FocusNode();
+  final TextEditingController _controllerStopMarketQuantity =
+      TextEditingController();
+  final FocusNode _focusNodeStopMarketQuantity = FocusNode();
+
+  /// Trailing Stop
+  final TextEditingController _controllerTrailingStopTD =
+      TextEditingController();
+  final FocusNode _focusNodeTrailingStopTD = FocusNode();
+  final TextEditingController _controllerTrailingStopLimit =
+      TextEditingController();
+  final FocusNode _focusNodeTrailingStopLimit = FocusNode();
+  final TextEditingController _controllerTrailingStopQuantity =
+      TextEditingController();
+  final FocusNode _focusNodeTrailingStopQuantity = FocusNode();
+
+  /// Stop Market
+  final TextEditingController _controllerOCCStopTP = TextEditingController();
+  final FocusNode _focusNodeOCCStopTP = FocusNode();
+  final TextEditingController _controllerOCCActiveSL = TextEditingController();
+  final FocusNode _focusNodeOCCActiveSL = FocusNode();
+  final TextEditingController _controllerOCCLimitQuantity =
+      TextEditingController();
+  final FocusNode _focusNodeOCCLimitQuantity = FocusNode();
+  final TextEditingController _controllerOCCQuantity = TextEditingController();
+  final FocusNode _focusNodeOCCQuantity = FocusNode();
+
+  bool get _hasFocus => _focusNodeTotalCoin.hasFocus;
+  bool get _hasText => _controllerTotalCoin.text.isNotEmpty;
 
   @override
   void initState() {
@@ -139,17 +180,18 @@ class _TradeHomeState extends ConsumerState<TradeHome>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-           Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   showModalBottomSheet(
                     backgroundColor: Colors.white,
                     context: context,
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
                     ),
                     builder: (context) {
                       return const CoinBottomSheet();
@@ -175,17 +217,18 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                   ],
                 ),
               ),
-               Text(
+              Text(
                 "${model.priceChangePercent.toStringAsFixed(2)} %",
                 style: TextStyle(
-                  color: model.priceChangePercent < 0 ?  ColorStyle.redColor : ColorStyle.greenColor,
+                  color: model.priceChangePercent < 0
+                      ? ColorStyle.redColor
+                      : ColorStyle.greenColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-
           const SizedBox(width: 12),
           const SizedBox(width: 12),
           Row(
@@ -208,8 +251,8 @@ class _TradeHomeState extends ConsumerState<TradeHome>
     );
   }
 
-  //body: Giá + Số lượng
-  Widget _buildBody(Size screenSize, OrderBookData orderBook, MarketDataModel model) {
+  Widget _buildBody(
+      Size screenSize, OrderBookData orderBook, MarketDataModel model) {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: screenSize.width * 0.03,
@@ -218,13 +261,15 @@ class _TradeHomeState extends ConsumerState<TradeHome>
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                   flex: 3,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       _buildPriceQuantityHeader(screenSize, orderBook),
-                      SizedBox(height: screenSize.height * 0.005),
+                      SizedBox(height: screenSize.height * 0.003),
                       _buildMainPrice(model),
                       _buildSubPrice(model),
                       _buildPriceQuantityBody(screenSize, orderBook),
@@ -240,16 +285,154 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       _buildButtonBuySell(screenSize),
                       SizedBox(height: screenSize.height * 0.01),
                       _buildButtonLimit(screenSize),
-                      SizedBox(height: screenSize.height * 0.01),
-                      _buildButtonPriceUSDT(screenSize, model),
-                      SizedBox(height: screenSize.height * 0.01),
-                      _buildButtonQuantityBTC(screenSize),
+                      ref.watch(selectedSpotTypeProvider) == 1
+                          ? Column(
+                              children: [
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildButtonPriceUSDT(screenSize, model),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildButtonQuantityBTC(screenSize),
+                                SizedBox(height: screenSize.height * 0.01),
+                              ],
+                            )
+                          : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 2
+                          ? Column(
+                              children: [
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildButtonPriceMarket(screenSize),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildButtonSelectedTypeCoin(screenSize),
+                                SizedBox(height: screenSize.height * 0.01)
+                              ],
+                            )
+                          : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 3
+                          ? Column(
+                              children: [
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerStopLimitStop,
+                                    label: "Stop (USDT)",
+                                    focusNode: _focusNodeStopLimitStop),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerStopLimitLimit,
+                                    label: "Limit (USDT)",
+                                    focusNode: _focusNodeStopLimitLimit),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerStopLimitQuantity,
+                                    label: "Số lượng (USDT)",
+                                    focusNode: _focusNodeStopLimitQuantity),
+                                SizedBox(height: screenSize.height * 0.01),
+                              ],
+                            )
+                          : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 4
+                          ? Column(
+                              children: [
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerStopMarketStop,
+                                    label: "Stop (USDT)",
+                                    focusNode: _focusNodeStopMarketStop),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildButtonPriceMarket(screenSize),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerStopMarketLimit,
+                                    label: "Số lượng (USDT)",
+                                    focusNode: _focusNodeStopMarketLimit),
+                                SizedBox(height: screenSize.height * 0.01),
+                              ],
+                            )
+                          : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 5
+                          ? Column(
+                              children: [
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildButtonTrailingStopTD(screenSize),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerTrailingStopLimit,
+                                    label: "Limit (USDT)",
+                                    focusNode: _focusNodeTrailingStopLimit),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerTrailingStopQuantity,
+                                    label: "Số lượng (BTC)",
+                                    focusNode: _focusNodeTrailingStopQuantity),
+                                SizedBox(height: screenSize.height * 0.01),
+                              ],
+                            )
+                          : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 6
+                          ? Column(
+                              children: [
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonTextFieldWithLabel(screenSize,
+                                    controller: _controllerOCCStopTP,
+                                    label: "Chốt lời",
+                                    focusNode: _focusNodeOCCStopTP,
+                                    hinText: 'Giới hạn TP (USDT)'),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonTextFieldWithLabel(screenSize,
+                                    controller: _controllerOCCActiveSL,
+                                    label: "Cắt lỗ",
+                                    focusNode: _focusNodeOCCActiveSL,
+                                    hinText: 'Kích hoạt SL (USDT)'),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildButtonOCCLimitButton(screenSize),
+                                SizedBox(height: screenSize.height * 0.01),
+                                _buildCommonButtonStopLimit(screenSize,
+                                    controller: _controllerOCCQuantity,
+                                    label: "Số lượng (BTC)",
+                                    focusNode: _focusNodeOCCQuantity),
+                                SizedBox(height: screenSize.height * 0.01),
+                              ],
+                            )
+                          : const SizedBox(height: 0),
                       SizedBox(height: screenSize.height * 0.01),
                       _buildStepper(screenSize),
-                      SizedBox(height: screenSize.height * 0.02),
-                      _buildButtonTotalUSDT(screenSize),
-                      SizedBox(height: screenSize.height * 0.01),
-                      _buildTP_SL(screenSize),
+                      ref.watch(selectedSpotTypeProvider) == 4
+                          ? Column(
+                        children: [
+                          SizedBox(height: screenSize.height * 0.005),
+                        ],
+                      ) : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 6 || ref.watch(selectedSpotTypeProvider) == 1 || ref.watch(selectedSpotTypeProvider) == 3
+                          ? Column(
+                        children: [
+                          SizedBox(height: screenSize.height * 0.016),
+                          _buildButtonTotalUSDT(screenSize),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      ) : const SizedBox(height: 8),
+                      ref.watch(selectedSpotTypeProvider) == 1
+                          ? Column(
+                        children: [
+                          SizedBox(height: screenSize.height * 0.005),
+                          _buildTP_SL(screenSize),
+                        ],
+                      ) : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 3
+                          ? Column(
+                        children: [
+                          SizedBox(height: screenSize.height * 0.005),
+                          _buildIceberg(screenSize),
+                          SizedBox(height: screenSize.height * 0.005),
+                        ],
+                      ) : const SizedBox(height: 0),
+                      ref.watch(selectedSpotTypeProvider) == 5
+                          ? Column(
+                        children: [
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildPriceActive(screenSize),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      ) : const SizedBox(height: 0),
+                      _buildInfoButtonBuyOrSell(screenSize)
                     ],
                   ))
             ],
@@ -264,6 +447,8 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   //Cột bên trái
   Widget _buildPriceQuantityHeader(Size screenSize, OrderBookData orderBook) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -271,8 +456,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Giá',
-                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('Giá', style: TextStyle(color: Colors.grey, fontSize: 12)),
                 Text('(USDT)',
                     style: TextStyle(color: Colors.grey, fontSize: 12)),
                 SizedBox(height: 5)
@@ -289,17 +473,17 @@ class _TradeHomeState extends ConsumerState<TradeHome>
             ),
           ],
         ),
-         SizedBox(
-          height: MediaQuery.of(context).size.width * 0.31,
+        SizedBox(
+           height: MediaQuery.of(context).size.width * (DataOrigin.bidsHeightBySpotTypes[ref.watch(selectedSpotTypeProvider)] ?? 0),
+          // height: MediaQuery.of(context).size.width * 0.445,
           child: ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: orderBook.asks.take(7).length,
+            itemCount: orderBook.asks.take(DataOrigin.takeUpRecordByCoinType[ref.watch(selectedSpotTypeProvider)] ?? 0).length,
             itemBuilder: (context, index) {
-              final ask = orderBook.asks.take(7).toList()[index];
+              final ask = orderBook.asks.take(DataOrigin.takeUpRecordByCoinType[ref.watch(selectedSpotTypeProvider)] ?? 0).toList()[index];
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   Container(
                     height: 20,
                     alignment: Alignment.center,
@@ -312,7 +496,6 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       textAlign: TextAlign.left,
                     ),
                   ),
-
                   Container(
                     height: 20,
                     alignment: Alignment.centerLeft,
@@ -335,13 +518,14 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   }
 
   Widget _buildPriceQuantityBody(Size screenSize, OrderBookData orderBook) {
-    return  SizedBox(
-      height: MediaQuery.of(context).size.width * 0.31,
+    return SizedBox(
+      height: MediaQuery.of(context).size.width * (DataOrigin.bidsHeightBySpotTypes[ref.watch(selectedSpotTypeProvider)] ?? 0),
+      // height: MediaQuery.of(context).size.width * 0.445,
       child: ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: orderBook.bids.take(7).length,
+        itemCount: orderBook.bids.take(DataOrigin.takeUpRecordByCoinType[ref.watch(selectedSpotTypeProvider)] ?? 0).length,
         itemBuilder: (context, index) {
-          final model = orderBook.bids.take(7).toList()[index];
+          final model = orderBook.bids.take(DataOrigin.takeUpRecordByCoinType[ref.watch(selectedSpotTypeProvider)] ?? 0).toList()[index];
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -357,7 +541,6 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                   textAlign: TextAlign.left,
                 ),
               ),
-
               Container(
                 height: 20,
                 alignment: Alignment.centerLeft,
@@ -393,32 +576,46 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   }
 
   Widget _buildBottomRow() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 23,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('0.01',
-                      style: TextStyle(color: Colors.grey[500], fontSize: 13)),
-                  Icon(Icons.arrow_drop_down,
-                      color: Colors.grey[500], size: 20),
-                ],
+    return GestureDetector(
+      onTap: (){
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          builder: (context) {
+            return const BidFormPopup();
+          },
+        );
+      },
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 23,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('${DataOrigin.bidFormPopupTypes[ref.watch(ProviderCommon.selectedBidFormPopupProvider)]}',
+                        style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+                    Icon(Icons.arrow_drop_down,
+                        color: Colors.grey[500], size: 20),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 7),
-        _buildMiniBars(),
-      ],
+          const SizedBox(width: 7),
+          _buildMiniBars(),
+        ],
+      ),
     );
   }
 
@@ -460,12 +657,11 @@ class _TradeHomeState extends ConsumerState<TradeHome>
     );
   }
 
-//Cột bên phải
   Widget _buildButtonBuySell(Size screenSize) {
     return Column(
       children: [
         Container(
-          height: 30,
+          height: 27,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey[400]!, width: 0.4),
             borderRadius: BorderRadius.circular(7),
@@ -473,7 +669,6 @@ class _TradeHomeState extends ConsumerState<TradeHome>
           clipBehavior: Clip.antiAlias, // Giúp nội dung bên trong cũng bo tròn
           child: Row(
             children: [
-              // Nút Mua
               Expanded(
                 child: GestureDetector(
                   onTap: () {
@@ -507,8 +702,6 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                   ),
                 ),
               ),
-
-              // Nút Bán
               Expanded(
                 child: GestureDetector(
                   onTap: () {
@@ -550,35 +743,344 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   }
 
   Widget _buildButtonLimit(Size screenSize) {
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          builder: (context) {
+            return const SpotTypePopupWidget();
+          },
+        );
+      },
+      child: Container(
+        height: 30,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+            color: Color(0xfff5f5f5),
+            borderRadius: BorderRadius.all(Radius.circular(7))),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Icon(
+                Icons.info_sharp,
+                size: 18,
+                color: Colors.grey,
+              ),
+              Text(
+                "${DataOrigin.spotTypes[ref.watch(selectedSpotTypeProvider)]}",
+                style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.bold),
+              ),
+              const Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtonSelectedTypeCoin(Size screenSize) {
     return Container(
-      height: 27,
+      height: 37,
       width: double.infinity,
       decoration: const BoxDecoration(
           color: Color(0xfff5f5f5),
           borderRadius: BorderRadius.all(Radius.circular(7))),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
-              Icons.info_sharp,
-              size: 18,
-              color: Colors.grey,
+            Expanded(
+              flex: 5,
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 200),
+                    top: (_hasFocus || _hasText) ? 2 : 11,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        fontSize: (_hasFocus || _hasText) ? 12 : 14,
+                        color: ColorStyle.grayColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                      child: const Text("Số lượng"),
+                    ),
+                  ),
+                  // TextField ẩn viền
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 16, bottom: 5), // đẩy xuống dưới label
+                    child: TextField(
+                      controller: _controllerTotalCoin,
+                      focusNode: _focusNodeTotalCoin,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      cursorHeight: 15,
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: "",
+                      ),
+                      cursorColor: Colors.amber,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            Text(
-              'Limit',
-              style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.black,
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.bold),
-            ),
-            Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey)
+            Expanded(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      builder: (context) {
+                        return const CoinTradingTypePopup();
+                      },
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "${DataOrigin.coinTradingTypes[ref.watch(selectedCoinTradingTypeProvider)]}",
+                        style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500),
+                        textAlign: TextAlign.center,
+                      ),
+                      const Icon(Icons.arrow_drop_down,
+                          size: 20, color: Colors.grey)
+                    ],
+                  ),
+                ))
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildCommonButtonStopLimit(Size screenSize,
+      {required TextEditingController controller,
+      required String label,
+      required FocusNode focusNode}) {
+    return Container(
+      height: 37,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+          color: Color(0xfff5f5f5),
+          borderRadius: BorderRadius.all(Radius.circular(7))),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+                flex: 1,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: const Icon(Icons.remove, size: 20, color: Colors.grey),
+                )),
+            Expanded(
+              flex: 5,
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 200),
+                    top: (focusNode.hasFocus || controller.text.isNotEmpty)
+                        ? 2
+                        : 11,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        fontSize:
+                            (focusNode.hasFocus || controller.text.isNotEmpty)
+                                ? 12
+                                : 13,
+                        color: ColorStyle.grayColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                      child: Text(label),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16, bottom: 5),
+                    child: TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      cursorHeight: 15,
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: "",
+                      ),
+                      cursorColor: Colors.amber,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+                flex: 1,
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      builder: (context) {
+                        return const CoinTradingTypePopup();
+                      },
+                    );
+                  },
+                  child: const Icon(Icons.add, size: 20, color: Colors.grey),
+                ))
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommonButtonTextFieldWithLabel(Size screenSize,
+      {required TextEditingController controller,
+      required String label,
+      required FocusNode focusNode,
+      required String hinText}) {
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13, color: ColorStyle.textDisableColor),),
+            Container(
+              height: 37,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                  color: Color(0xfff5f5f5),
+                  borderRadius: BorderRadius.all(Radius.circular(7))),
+              child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: const Icon(Icons.remove,
+                                size: 20, color: Colors.grey),
+                          )),
+                      Expanded(
+                        flex: 5,
+                        child: Stack(
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 200),
+                              top:
+                              (focusNode.hasFocus || controller.text.isNotEmpty)
+                                  ? 2
+                                  : 11,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 200),
+                                style: TextStyle(
+                                  fontSize: (focusNode.hasFocus ||
+                                      controller.text.isNotEmpty)
+                                      ? 12
+                                      : 13,
+                                  color: ColorStyle.grayColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                                child: Text(hinText),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16, bottom: 5),
+                              child: TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                keyboardType: const TextInputType.numberWithOptions(
+                                    decimal: true),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                cursorHeight: 15,
+                                textAlign: TextAlign.center,
+                                decoration: const InputDecoration.collapsed(
+                                  hintText: "",
+                                ),
+                                cursorColor: Colors.amber,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16)),
+                                ),
+                                builder: (context) {
+                                  return const CoinTradingTypePopup();
+                                },
+                              );
+                            },
+                            child:
+                            const Icon(Icons.add, size: 20, color: Colors.grey),
+                          ))
+                    ],
+                  )),
+            )
+          ],
+        ));
   }
 
   Widget _buildButtonPriceUSDT(Size screenSize, MarketDataModel model) {
@@ -657,28 +1159,303 @@ class _TradeHomeState extends ConsumerState<TradeHome>
     );
   }
 
+  double dragPosition = 0.0;
+  final double stepSize = 50.0;
+  double get totalWidth => (totalSteps - 1) * stepSize;
+
   Widget _buildStepper(Size screenSize) {
-    return Row(
-      children: List.generate(totalSteps * 2 - 1, (index) {
-        if (index.isOdd) {
-          // Vẽ đường kẻ giữa các bước
-          return Expanded(
-            child: Container(
-              height: 1,
-              color: Colors.grey.shade300,
+    return SizedBox(
+      height: 60,
+      width: totalWidth + 20,
+      child: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          setState(() {
+            dragPosition += details.delta.dx;
+            dragPosition = dragPosition.clamp(0, totalWidth);
+          });
+        },
+        child: Stack(
+          children: [
+            Row(
+              children: List.generate(totalSteps * 2 - 1, (index) {
+                if (index % 2 == 0) {
+                  int stepIndex = index ~/ 2;
+                  bool isActive = stepIndex * stepSize <= dragPosition;
+                  return _buildDiamond(isActive: isActive);
+                } else {
+                  return Container(width: stepSize / 2, height: 2, color: Colors.grey.shade300);
+                }
+              }),
             ),
-          );
-        } else {
-          int stepIndex = index ~/ 2;
-          bool isActive = stepIndex == currentStep;
-          return CustomPaint(
-            size: const Size(15, 15),
-            painter: DiamondPainter(isActive: isActive),
-          );
-        }
-      }),
+            Positioned(
+              left: dragPosition,
+              top: 0,
+              child: GestureDetector(
+                child: Transform.rotate(
+                  angle: 3.14 / 4,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      border: Border.all(color: Colors.black, width: 2),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    //   Row(
+    //   children: List.generate(totalSteps * 2 - 1, (index) {
+    //     if (index.isOdd) {
+    //       return Expanded(
+    //         child: Container(
+    //           height: 1,
+    //           color: Colors.grey.shade300,
+    //         ),
+    //       );
+    //     } else {
+    //       int stepIndex = index ~/ 2;
+    //       bool isActive = stepIndex == currentStep;
+    //       return CustomPaint(
+    //         size: const Size(15, 15),
+    //         painter: DiamondPainter(isActive: isActive),
+    //       );
+    //     }
+    //   }),
+    // );
+  }
+
+  Widget _buildDiamond({required bool isActive}) {
+    return Transform.rotate(
+      angle: 3.14 / 4,
+      child: Container(
+        width: 14,
+        height: 14,
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.orange : Colors.white,
+          border: Border.all(
+            color: isActive ? Colors.orange : Colors.grey.shade300,
+            width: 2,
+          ),
+        ),
+      ),
     );
   }
+  Widget _buildButtonPriceMarket(Size screenSize) {
+    return Container(
+      height: 37,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+          color: Color(0xfff5f5f5),
+          borderRadius: BorderRadius.all(Radius.circular(7))),
+      child: const Center(
+        child: Text(
+          "Giá thị trường",
+          style: TextStyle(
+              fontSize: 15,
+              color: ColorStyle.grayColor,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtonTrailingStopTD(Size screenSize) {
+    return SizedBox(
+      height: 37,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Container(
+              height: 37,
+              decoration: const BoxDecoration(
+                  color: Color(0xfff5f5f5),
+                  borderRadius: BorderRadius.all(Radius.circular(7))),
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 200),
+                      top: (_focusNodeTrailingStopTD.hasFocus ||
+                              _controllerTrailingStopTD.text.isNotEmpty)
+                          ? 2
+                          : 11,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 200),
+                        style: TextStyle(
+                          fontSize: (_focusNodeTrailingStopTD.hasFocus ||
+                                  _controllerTrailingStopTD.text.isNotEmpty)
+                              ? 12
+                              : 15,
+                          color: ColorStyle.grayColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                        child: const Text("T/D(%)"),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16, bottom: 5),
+                      child: TextField(
+                        controller: _controllerTrailingStopTD,
+                        focusNode: _focusNodeTrailingStopTD,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        cursorHeight: 15,
+                        textAlign: TextAlign.center,
+                        decoration: const InputDecoration.collapsed(
+                          hintText: "",
+                        ),
+                        cursorColor: Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onTap: () {
+                _controllerTrailingStopTD.text = "1";
+              },
+              child: Container(
+                height: 37,
+                decoration: const BoxDecoration(
+                    color: Color(0xfff5f5f5),
+                    borderRadius: BorderRadius.all(Radius.circular(7))),
+                child: const Center(
+                  child: Text(
+                    "1%",
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: ColorStyle.blackColor,
+                        fontWeight: FontWeight.normal),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onTap: () {
+                _controllerTrailingStopTD.text = "2";
+              },
+              child: Container(
+                height: 37,
+                decoration: const BoxDecoration(
+                    color: Color(0xfff5f5f5),
+                    borderRadius: BorderRadius.all(Radius.circular(7))),
+                child: const Center(
+                  child: Text(
+                    "2%",
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: ColorStyle.blackColor,
+                        fontWeight: FontWeight.normal),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButtonOCCLimitButton(Size screenSize) {
+    return SizedBox(
+      height: 37,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Column(
+              children: [
+                _buildCommonButtonStopLimit(screenSize,
+                    controller: _controllerOCCLimitQuantity,
+                    label: "${DataOrigin.ocoLimitOrMarketLabelTypes[ref.watch(ProviderCommon.selectedLimitOrMarketOCOProvider)]}",
+                    focusNode: _focusNodeOCCLimitQuantity),
+              ],
+            )
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          Expanded(
+            flex: 2,
+            child: GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  backgroundColor: Colors.white,
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (context) {
+                    return const OceLimitOrMarketPopup();
+                  },
+                );
+              },
+              child: Container(
+                height: 37,
+                padding: const EdgeInsets.only(left: 2, right: 5),
+                decoration: const BoxDecoration(
+                    color: Color(0xfff5f5f5),
+                    borderRadius: BorderRadius.all(Radius.circular(7))),
+                child:  Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        "${DataOrigin.ocoLimitOrMarketTypes[ref.watch(ProviderCommon.selectedLimitOrMarketOCOProvider)]}",
+                        style: const TextStyle(
+                            fontSize: 13,
+                            color: ColorStyle.blackColor,
+                            fontWeight: FontWeight.normal),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                     const Expanded(
+                        flex: 1,
+                        child: Icon(Icons.arrow_drop_down,  color: ColorStyle.grayColor, size: 20))
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildButtonTotalUSDT(Size screenSize) {
     return Container(
@@ -700,53 +1477,12 @@ class _TradeHomeState extends ConsumerState<TradeHome>
     );
   }
 
-  Widget _buildTP_SL(Size screenSize) {
+  Widget _buildInfoButtonBuyOrSell(Size screenSize){
     return SizedBox(
       width: double.infinity,
       child: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                height: 15,
-                width: 15,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: const BorderRadius.all(Radius.circular(3))),
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              const Text(
-                'TP/SL',
-                style: TextStyle(color: Colors.black, fontSize: 14),
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 7,
-          ),
-          Row(
-            children: [
-              Container(
-                height: 15,
-                width: 15,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: const BorderRadius.all(Radius.circular(3))),
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              const Text(
-                'Tảng băng',
-                style: TextStyle(color: Colors.black, fontSize: 14),
-              )
-            ],
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 2),
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -807,12 +1543,14 @@ class _TradeHomeState extends ConsumerState<TradeHome>
           Container(
             height: 37,
             width: double.infinity,
-            decoration:  BoxDecoration(
-                color: ref.watch(isBuySelectedProvider) ? ColorStyle.greenColor : ColorStyle.redColor,
+            decoration: BoxDecoration(
+                color: ref.watch(isBuySelectedProvider)
+                    ? ColorStyle.greenColor
+                    : ColorStyle.redColor,
                 borderRadius: const BorderRadius.all(Radius.circular(7))),
-            child:  Center(
+            child: Center(
               child: Text(
-                 ref.watch(isBuySelectedProvider) ?  'Mua BTC' : 'Bán BTC',
+                ref.watch(isBuySelectedProvider) ? 'Mua BTC' : 'Bán BTC',
                 style: const TextStyle(
                     fontSize: 13,
                     color: Colors.white,
@@ -821,6 +1559,115 @@ class _TradeHomeState extends ConsumerState<TradeHome>
               ),
             ),
           )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIceberg(Size screenSize) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                height: 13,
+                width: 13,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: const BorderRadius.all(Radius.circular(3))),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              const Text(
+                'Tảng băng',
+                style: TextStyle(color: Colors.black, fontSize: 13),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceActive(Size screenSize) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                height: 13,
+                width: 13,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: const BorderRadius.all(Radius.circular(3))),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              const Text(
+                'Giá kích hoạt',
+                style: TextStyle(color: Colors.black, fontSize: 13),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTP_SL(Size screenSize) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                height: 13,
+                width: 13,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: const BorderRadius.all(Radius.circular(3))),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              const Text(
+                'TP/SL',
+                style: TextStyle(color: Colors.black, fontSize: 13),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 7,
+          ),
+          Row(
+            children: [
+              Container(
+                height: 13,
+                width: 13,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: const BorderRadius.all(Radius.circular(3))),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              const Text(
+                'Tảng băng',
+                style: TextStyle(color: Colors.black, fontSize: 13),
+              )
+            ],
+          ),
         ],
       ),
     );

@@ -87,7 +87,7 @@ class CoinBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.75, // Cho scroll được
+            height: MediaQuery.of(context).size.height * 0.74, // Cho scroll được
             child: const CoinListItemPopup(),
           ),
         ],

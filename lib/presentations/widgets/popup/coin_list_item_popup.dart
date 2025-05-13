@@ -59,7 +59,7 @@ class CoinListItemPopup extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          ( double.parse(coin?.openPrice ?? '0') + double.parse(coin?.priceChange ?? '0')).toStringAsFixed(2),
+                          ( double.parse(coin?.priceChange ?? '0') + double.parse(coin?.priceChange ?? '0')).toStringAsFixed(2),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 2),
@@ -92,25 +92,3 @@ class CoinListItemPopup extends ConsumerWidget {
     }
   }
 }
-
-/*
-
-ListTile(
-          leading: const Icon(Icons.star_border),
-          title: Text(coin?.symbol ?? ""),
-          subtitle: Text(coin?.volume ?? ""),
-          trailing: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                (coin?.priceChange ?? '').toString(),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '${double.parse(coin?.priceChange ?? '0') > 0 ? '+' : ''}${double.parse(coin?.priceChange ?? '0').toStringAsFixed(2)}%',
-                style: TextStyle(color: double.parse(coin?.priceChange ?? '0') >= 0 ? ColorStyle.greenColor : ColorStyle.redColor),
-              ),
-            ],
-          ),
-        );
- */
