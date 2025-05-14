@@ -13,18 +13,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class TradeHome extends ConsumerStatefulWidget {
-  const TradeHome({super.key});
+class FuturePage extends ConsumerStatefulWidget {
+  const FuturePage({super.key});
 
   @override
-  ConsumerState<TradeHome> createState() => _TradeHomeState();
+  ConsumerState<FuturePage> createState() => _FuturePageState();
 }
 
 final numberFormat = NumberFormat("#,##0.0", "en_US");
 final selectedSpotTypeProvider = StateProvider<int>((ref) => 1);
 final selectedCoinTradingTypeProvider = StateProvider<int>((ref) => 1);
 
-class _TradeHomeState extends ConsumerState<TradeHome>
+class _FuturePageState extends ConsumerState<FuturePage>
     with SingleTickerProviderStateMixin {
   final selectedIndexProvider = StateProvider<int>((ref) => 0);
   final selectedTabIndexProvider = StateProvider<int>((ref) => 0);
@@ -39,35 +39,35 @@ class _TradeHomeState extends ConsumerState<TradeHome>
 
   /// Stop Limit
   final TextEditingController _controllerStopLimitStop =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeStopLimitStop = FocusNode();
   final TextEditingController _controllerStopLimitLimit =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeStopLimitLimit = FocusNode();
   final TextEditingController _controllerStopLimitQuantity =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeStopLimitQuantity = FocusNode();
 
   /// Stop Market
   final TextEditingController _controllerStopMarketStop =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeStopMarketStop = FocusNode();
   final TextEditingController _controllerStopMarketLimit =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeStopMarketLimit = FocusNode();
   final TextEditingController _controllerStopMarketQuantity =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeStopMarketQuantity = FocusNode();
 
   /// Trailing Stop
   final TextEditingController _controllerTrailingStopTD =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeTrailingStopTD = FocusNode();
   final TextEditingController _controllerTrailingStopLimit =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeTrailingStopLimit = FocusNode();
   final TextEditingController _controllerTrailingStopQuantity =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeTrailingStopQuantity = FocusNode();
 
   /// Stop Market
@@ -76,7 +76,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   final TextEditingController _controllerOCCActiveSL = TextEditingController();
   final FocusNode _focusNodeOCCActiveSL = FocusNode();
   final TextEditingController _controllerOCCLimitQuantity =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _focusNodeOCCLimitQuantity = FocusNode();
   final TextEditingController _controllerOCCQuantity = TextEditingController();
   final FocusNode _focusNodeOCCQuantity = FocusNode();
@@ -127,16 +127,15 @@ class _TradeHomeState extends ConsumerState<TradeHome>
             children: [
               Expanded(
                   child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildTab('Chuyển đổi', index: 0, ref: ref),
-                    _buildTab('Giao ngay', index: 1, ref: ref),
-                    _buildTab('Margin', index: 2, ref: ref),
-                    _buildTab('Mua/Bán', index: 3, ref: ref)
-                  ],
-                ),
-              )),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildTab('USDS-M', index: 0, ref: ref),
+                        _buildTab('COIN-M', index: 1, ref: ref),
+                        _buildTab('Quyền chọn', index: 2, ref: ref),
+                      ],
+                    ),
+                  )),
               const SizedBox(width: 5),
               const Icon(
                 Icons.menu,
@@ -157,7 +156,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: GestureDetector(
           onTap: () =>
-              {ref?.read(selectedIndexProvider.notifier).state = index},
+          {ref?.read(selectedIndexProvider.notifier).state = index},
           child: Text(
             text,
             style: TextStyle(
@@ -191,7 +190,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(16)),
+                      BorderRadius.vertical(top: Radius.circular(16)),
                     ),
                     builder: (context) {
                       return const CoinBottomSheet();
@@ -287,111 +286,111 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       _buildButtonLimit(screenSize),
                       ref.watch(selectedSpotTypeProvider) == 1
                           ? Column(
-                              children: [
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildButtonPriceUSDT(screenSize, model),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildButtonQuantityBTC(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
-                              ],
-                            )
+                        children: [
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildButtonPriceUSDT(screenSize, model),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildButtonQuantityBTC(screenSize),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      )
                           : const SizedBox(height: 0),
                       ref.watch(selectedSpotTypeProvider) == 2
                           ? Column(
-                              children: [
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildButtonPriceMarket(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildButtonSelectedTypeCoin(screenSize),
-                                SizedBox(height: screenSize.height * 0.004)
-                              ],
-                            )
+                        children: [
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildButtonPriceMarket(screenSize),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildButtonSelectedTypeCoin(screenSize),
+                          SizedBox(height: screenSize.height * 0.004)
+                        ],
+                      )
                           : const SizedBox(height: 0),
                       ref.watch(selectedSpotTypeProvider) == 3
                           ? Column(
-                              children: [
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerStopLimitStop,
-                                    label: "Stop (USDT)",
-                                    focusNode: _focusNodeStopLimitStop),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerStopLimitLimit,
-                                    label: "Limit (USDT)",
-                                    focusNode: _focusNodeStopLimitLimit),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerStopLimitQuantity,
-                                    label: "Số lượng (USDT)",
-                                    focusNode: _focusNodeStopLimitQuantity),
-                                SizedBox(height: screenSize.height * 0.01),
-                              ],
-                            )
+                        children: [
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerStopLimitStop,
+                              label: "Stop (USDT)",
+                              focusNode: _focusNodeStopLimitStop),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerStopLimitLimit,
+                              label: "Limit (USDT)",
+                              focusNode: _focusNodeStopLimitLimit),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerStopLimitQuantity,
+                              label: "Số lượng (USDT)",
+                              focusNode: _focusNodeStopLimitQuantity),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      )
                           : const SizedBox(height: 0),
                       ref.watch(selectedSpotTypeProvider) == 4
                           ? Column(
-                              children: [
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerStopMarketStop,
-                                    label: "Stop (USDT)",
-                                    focusNode: _focusNodeStopMarketStop),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildButtonPriceMarket(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerStopMarketLimit,
-                                    label: "Số lượng (USDT)",
-                                    focusNode: _focusNodeStopMarketLimit),
-                                SizedBox(height: screenSize.height * 0.01),
-                              ],
-                            )
+                        children: [
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerStopMarketStop,
+                              label: "Stop (USDT)",
+                              focusNode: _focusNodeStopMarketStop),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildButtonPriceMarket(screenSize),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerStopMarketLimit,
+                              label: "Số lượng (USDT)",
+                              focusNode: _focusNodeStopMarketLimit),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      )
                           : const SizedBox(height: 0),
                       ref.watch(selectedSpotTypeProvider) == 5
                           ? Column(
-                              children: [
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildButtonTrailingStopTD(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerTrailingStopLimit,
-                                    label: "Limit (USDT)",
-                                    focusNode: _focusNodeTrailingStopLimit),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerTrailingStopQuantity,
-                                    label: "Số lượng (BTC)",
-                                    focusNode: _focusNodeTrailingStopQuantity),
-                                SizedBox(height: screenSize.height * 0.01),
-                              ],
-                            )
+                        children: [
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildButtonTrailingStopTD(screenSize),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerTrailingStopLimit,
+                              label: "Limit (USDT)",
+                              focusNode: _focusNodeTrailingStopLimit),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerTrailingStopQuantity,
+                              label: "Số lượng (BTC)",
+                              focusNode: _focusNodeTrailingStopQuantity),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      )
                           : const SizedBox(height: 0),
                       ref.watch(selectedSpotTypeProvider) == 6
                           ? Column(
-                              children: [
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonTextFieldWithLabel(screenSize,
-                                    controller: _controllerOCCStopTP,
-                                    label: "Chốt lời",
-                                    focusNode: _focusNodeOCCStopTP,
-                                    hinText: 'Giới hạn TP (USDT)'),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonTextFieldWithLabel(screenSize,
-                                    controller: _controllerOCCActiveSL,
-                                    label: "Cắt lỗ",
-                                    focusNode: _focusNodeOCCActiveSL,
-                                    hinText: 'Kích hoạt SL (USDT)'),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildButtonOCCLimitButton(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
-                                _buildCommonButtonStopLimit(screenSize,
-                                    controller: _controllerOCCQuantity,
-                                    label: "Số lượng (BTC)",
-                                    focusNode: _focusNodeOCCQuantity),
-                                SizedBox(height: screenSize.height * 0.01),
-                              ],
-                            )
+                        children: [
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonTextFieldWithLabel(screenSize,
+                              controller: _controllerOCCStopTP,
+                              label: "Chốt lời",
+                              focusNode: _focusNodeOCCStopTP,
+                              hinText: 'Giới hạn TP (USDT)'),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonTextFieldWithLabel(screenSize,
+                              controller: _controllerOCCActiveSL,
+                              label: "Cắt lỗ",
+                              focusNode: _focusNodeOCCActiveSL,
+                              hinText: 'Kích hoạt SL (USDT)'),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildButtonOCCLimitButton(screenSize),
+                          SizedBox(height: screenSize.height * 0.01),
+                          _buildCommonButtonStopLimit(screenSize,
+                              controller: _controllerOCCQuantity,
+                              label: "Số lượng (BTC)",
+                              focusNode: _focusNodeOCCQuantity),
+                          SizedBox(height: screenSize.height * 0.01),
+                        ],
+                      )
                           : const SizedBox(height: 0),
                       SizedBox(height: screenSize.height * 0.02),
                       _buildStepper(screenSize),
@@ -468,7 +467,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
           ],
         ),
         SizedBox(
-           height: MediaQuery.of(context).size.width * (DataOrigin.bidsHeightBySpotTypes[ref.watch(selectedSpotTypeProvider)] ?? 0),
+          height: MediaQuery.of(context).size.width * (DataOrigin.bidsHeightBySpotTypes[ref.watch(selectedSpotTypeProvider)] ?? 0),
           // height: MediaQuery.of(context).size.width * 0.445,
           child: ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
@@ -624,11 +623,11 @@ class _TradeHomeState extends ConsumerState<TradeHome>
             child: Column(
               children: List.generate(
                 3,
-                (index) => Expanded(
+                    (index) => Expanded(
                   child: Container(
                     color: Colors.grey,
                     margin:
-                        index < 2 ? const EdgeInsets.only(bottom: 1.5) : null,
+                    index < 2 ? const EdgeInsets.only(bottom: 1.5) : null,
                   ),
                 ),
               ),
@@ -824,7 +823,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       controller: _controllerTotalCoin,
                       focusNode: _focusNodeTotalCoin,
                       keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      const TextInputType.numberWithOptions(decimal: true),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -849,7 +848,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
                         borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(16)),
+                        BorderRadius.vertical(top: Radius.circular(16)),
                       ),
                       builder: (context) {
                         return const CoinTradingTypePopup();
@@ -880,8 +879,8 @@ class _TradeHomeState extends ConsumerState<TradeHome>
 
   Widget _buildCommonButtonStopLimit(Size screenSize,
       {required TextEditingController controller,
-      required String label,
-      required FocusNode focusNode}) {
+        required String label,
+        required FocusNode focusNode}) {
     return Container(
       height: 37,
       width: double.infinity,
@@ -916,9 +915,9 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       duration: const Duration(milliseconds: 200),
                       style: TextStyle(
                         fontSize:
-                            (focusNode.hasFocus || controller.text.isNotEmpty)
-                                ? 12
-                                : 13,
+                        (focusNode.hasFocus || controller.text.isNotEmpty)
+                            ? 12
+                            : 13,
                         color: ColorStyle.grayColor,
                         fontWeight: FontWeight.w500,
                       ),
@@ -932,7 +931,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       controller: controller,
                       focusNode: focusNode,
                       keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      const TextInputType.numberWithOptions(decimal: true),
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -957,7 +956,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
                         borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(16)),
+                        BorderRadius.vertical(top: Radius.circular(16)),
                       ),
                       builder: (context) {
                         return const CoinTradingTypePopup();
@@ -974,9 +973,9 @@ class _TradeHomeState extends ConsumerState<TradeHome>
 
   Widget _buildCommonButtonTextFieldWithLabel(Size screenSize,
       {required TextEditingController controller,
-      required String label,
-      required FocusNode focusNode,
-      required String hinText}) {
+        required String label,
+        required FocusNode focusNode,
+        required String hinText}) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.01),
         child: Column(
@@ -1179,8 +1178,8 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                     bool isActive = stepIndex * stepSize/2 <= dragPosition;
                     return _buildDiamond(isActive: isActive);
                   } else {
-                      int stepIndex = index ~/ 2;
-                      bool isActive = stepIndex * stepSize/2 < dragPosition;
+                    int stepIndex = index ~/ 2;
+                    bool isActive = stepIndex * stepSize/2 < dragPosition;
                     return Container(width: stepSize / 2 + 3, height: 1, color: isActive ? ColorStyle.blackColor : ColorStyle.grayColor);
                   }
                 }),
@@ -1196,9 +1195,9 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                     width: 13,
                     height: 13,
                     decoration: BoxDecoration(
-                      color: ColorStyle.whiteColor,
-                      border: Border.all(color: Colors.black, width: 1),
-                      borderRadius: const BorderRadius.all(Radius.circular(3))
+                        color: ColorStyle.whiteColor,
+                        border: Border.all(color: Colors.black, width: 1),
+                        borderRadius: const BorderRadius.all(Radius.circular(3))
                     ),
                   ),
                 ),
@@ -1238,12 +1237,12 @@ class _TradeHomeState extends ConsumerState<TradeHome>
         height: 9,
         margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
-          color:  isActive ? ColorStyle.blackColor : null,
-          border: Border.all(
-            color: isActive ? ColorStyle.blackColor : ColorStyle.grayColor,
-            width: 0.5,
-          ),
-          borderRadius: const BorderRadius.all(Radius.circular(2))
+            color:  isActive ? ColorStyle.blackColor : null,
+            border: Border.all(
+              color: isActive ? ColorStyle.blackColor : ColorStyle.grayColor,
+              width: 0.5,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(2))
         ),
       ),
     );
@@ -1287,7 +1286,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 200),
                       top: (_focusNodeTrailingStopTD.hasFocus ||
-                              _controllerTrailingStopTD.text.isNotEmpty)
+                          _controllerTrailingStopTD.text.isNotEmpty)
                           ? 2
                           : 11,
                       left: 0,
@@ -1297,7 +1296,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                         duration: const Duration(milliseconds: 200),
                         style: TextStyle(
                           fontSize: (_focusNodeTrailingStopTD.hasFocus ||
-                                  _controllerTrailingStopTD.text.isNotEmpty)
+                              _controllerTrailingStopTD.text.isNotEmpty)
                               ? 12
                               : 15,
                           color: ColorStyle.grayColor,
@@ -1394,15 +1393,15 @@ class _TradeHomeState extends ConsumerState<TradeHome>
       child: Row(
         children: [
           Expanded(
-            flex: 4,
-            child: Column(
-              children: [
-                _buildCommonButtonStopLimit(screenSize,
-                    controller: _controllerOCCLimitQuantity,
-                    label: "${DataOrigin.ocoLimitOrMarketLabelTypes[ref.watch(ProviderCommon.selectedLimitOrMarketOCOProvider)]}",
-                    focusNode: _focusNodeOCCLimitQuantity),
-              ],
-            )
+              flex: 4,
+              child: Column(
+                children: [
+                  _buildCommonButtonStopLimit(screenSize,
+                      controller: _controllerOCCLimitQuantity,
+                      label: "${DataOrigin.ocoLimitOrMarketLabelTypes[ref.watch(ProviderCommon.selectedLimitOrMarketOCOProvider)]}",
+                      focusNode: _focusNodeOCCLimitQuantity),
+                ],
+              )
           ),
           const SizedBox(
             width: 5,
@@ -1444,7 +1443,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                         maxLines: 1,
                       ),
                     ),
-                     const Expanded(
+                    const Expanded(
                         flex: 1,
                         child: Icon(Icons.arrow_drop_down,  color: ColorStyle.grayColor, size: 20))
                   ],
@@ -1696,8 +1695,9 @@ class _TradeHomeState extends ConsumerState<TradeHome>
         child: Row(
           children: [
             SizedBox(width: screenSize.width * 0.02),
-            _buildTabText('Lệnh chờ (0)', index: 0, ref: ref),
-            _buildTabText('Tài sản(2)', index: 1, ref: ref),
+            _buildTabText('Vị thế (0)', index: 0, ref: ref),
+            _buildTabText('Lệnh chờ(2)', index: 1, ref: ref),
+            _buildTabText('Lưới Hợp đồng tương lai', index: 2, ref: ref),
           ],
         ),
       ),
@@ -1711,7 +1711,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: GestureDetector(
         onTap: () =>
-            {ref?.read(selectedTabIndexProvider.notifier).state = index},
+        {ref?.read(selectedTabIndexProvider.notifier).state = index},
         child: Column(
           children: [
             Text(

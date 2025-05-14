@@ -1,4 +1,5 @@
 import 'package:binance_mobile/core/dependency_injection/injection_container.dart';
+import 'package:binance_mobile/presentations/screens/future_page/future_page.dart';
 import 'package:binance_mobile/presentations/screens/home_page/home_page.dart';
 import 'package:binance_mobile/presentations/screens/market_page/market_home.dart';
 import 'package:binance_mobile/presentations/screens/detail_page/detail_page.dart';
@@ -16,12 +17,10 @@ class MainPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
     final List<Widget> _screens = [
-      const TradeHome(), // HomePage(),
+      HomePage(),
       const MarketHome(),
       const TradeHome(),
-      const Center(
-        child: Text('Đây là màn Futures'),
-      ),
+      const FuturePage(),
       // const CoinDetailScreen(symbol: 'btc/usdt'),
       const WalletsHome()
     ];
