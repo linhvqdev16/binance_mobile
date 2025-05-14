@@ -17,7 +17,8 @@ class MainPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
     final List<Widget> _screens = [
-      HomePage(),
+
+      const FuturePage(),//HomePage(),
       const MarketHome(),
       const TradeHome(),
       const FuturePage(),

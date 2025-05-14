@@ -292,7 +292,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                                 _buildButtonPriceUSDT(screenSize, model),
                                 SizedBox(height: screenSize.height * 0.01),
                                 _buildButtonQuantityBTC(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
+                                // SizedBox(height: screenSize.height * 0.005),
                               ],
                             )
                           : const SizedBox(height: 0),
@@ -301,9 +301,9 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                               children: [
                                 SizedBox(height: screenSize.height * 0.01),
                                 _buildButtonPriceMarket(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
+                                SizedBox(height: screenSize.height * 0.008),
                                 _buildButtonSelectedTypeCoin(screenSize),
-                                SizedBox(height: screenSize.height * 0.004)
+                                // SizedBox(height: screenSize.height * 0.004)
                               ],
                             )
                           : const SizedBox(height: 0),
@@ -325,7 +325,6 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                                     controller: _controllerStopLimitQuantity,
                                     label: "Số lượng (USDT)",
                                     focusNode: _focusNodeStopLimitQuantity),
-                                SizedBox(height: screenSize.height * 0.01),
                               ],
                             )
                           : const SizedBox(height: 0),
@@ -344,7 +343,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                                     controller: _controllerStopMarketLimit,
                                     label: "Số lượng (USDT)",
                                     focusNode: _focusNodeStopMarketLimit),
-                                SizedBox(height: screenSize.height * 0.01),
+                                SizedBox(height: screenSize.height * 0.003),
                               ],
                             )
                           : const SizedBox(height: 0),
@@ -363,7 +362,6 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                                     controller: _controllerTrailingStopQuantity,
                                     label: "Số lượng (BTC)",
                                     focusNode: _focusNodeTrailingStopQuantity),
-                                SizedBox(height: screenSize.height * 0.01),
                               ],
                             )
                           : const SizedBox(height: 0),
@@ -382,14 +380,13 @@ class _TradeHomeState extends ConsumerState<TradeHome>
                                     label: "Cắt lỗ",
                                     focusNode: _focusNodeOCCActiveSL,
                                     hinText: 'Kích hoạt SL (USDT)'),
-                                SizedBox(height: screenSize.height * 0.01),
+                                SizedBox(height: screenSize.height * 0.007),
                                 _buildButtonOCCLimitButton(screenSize),
-                                SizedBox(height: screenSize.height * 0.01),
+                                SizedBox(height: screenSize.height * 0.007),
                                 _buildCommonButtonStopLimit(screenSize,
                                     controller: _controllerOCCQuantity,
                                     label: "Số lượng (BTC)",
                                     focusNode: _focusNodeOCCQuantity),
-                                SizedBox(height: screenSize.height * 0.01),
                               ],
                             )
                           : const SizedBox(height: 0),
@@ -1154,7 +1151,7 @@ class _TradeHomeState extends ConsumerState<TradeHome>
   }
 
   double dragPosition = 0.0;
-  final double stepSize = 77.0;
+  final double stepSize = 73.0;
   double get totalWidth => (totalSteps - 1) * stepSize;
 
   Widget _buildStepper(Size screenSize) {

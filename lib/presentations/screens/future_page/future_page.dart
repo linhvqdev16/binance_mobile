@@ -4,6 +4,7 @@ import 'package:binance_mobile/core/styles/colors.dart';
 import 'package:binance_mobile/data/models/models/market_data_model.dart';
 import 'package:binance_mobile/data/models/models/order_book_data.dart';
 import 'package:binance_mobile/presentations/provider/provider_common.dart';
+import 'package:binance_mobile/presentations/screens/future_page/widget/coin_bottom_sheet.dart';
 import 'package:binance_mobile/presentations/widgets/popup/bid_form_popup.dart';
 import 'package:binance_mobile/presentations/widgets/popup/coin_bottom_sheet.dart';
 import 'package:binance_mobile/presentations/widgets/popup/coin_trading_type_popup.dart';
@@ -178,6 +179,7 @@ class _FuturePageState extends ConsumerState<FuturePage>
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +195,7 @@ class _FuturePageState extends ConsumerState<FuturePage>
                       BorderRadius.vertical(top: Radius.circular(16)),
                     ),
                     builder: (context) {
-                      return const CoinBottomSheet();
+                      return const CoinBottomFutureSheet();
                     },
                   );
                 },
@@ -228,21 +230,52 @@ class _FuturePageState extends ConsumerState<FuturePage>
               ),
             ],
           ),
-          const SizedBox(width: 12),
-          const SizedBox(width: 12),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.compare_arrows,
-                color: Colors.grey[400],
-                size: 18,
+              Image.asset(
+                'assets/icons/sword_icon.png',
+                width: 20,
+                height: 20,
               ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.more_horiz,
-                color: Colors.grey[400],
-                size: 18,
+              const SizedBox(width: 15,),
+              Image.asset(
+                'assets/icons/candle_chart.png',
+                width: 17,
+                height: 17,
               ),
+              const SizedBox(width: 15,),
+              Image.asset(
+                'assets/icons/change_icon.png',
+                width: 17,
+                height: 17,
+              ),
+              const SizedBox(width: 15,),
+              Stack(
+                children: [
+                  Padding(
+                    padding:  const EdgeInsets.only(top: 10),
+                    child: Image.asset(
+                      'assets/icons/diot_icon.png',
+                      width: 15,
+                      height: 5,
+                    ),
+                  ),
+
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        color: Colors.amber, // Màu vàng
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ],

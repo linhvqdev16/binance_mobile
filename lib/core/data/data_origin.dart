@@ -63,4 +63,31 @@ class DataOrigin{
     5: "50",
     6: "100"
   };
+  static final Map<int, String> filterFutureOptions = {
+    1: 'Danh sách yêu thích',
+    2: 'Tất cả',
+    3: 'Dánh sách niêm yết mới',
+    4: 'Vĩnh cửu',
+    5: 'USDC Vĩnh cửu',
+    6: 'Kỳ hạn'
+  };
+
+  static final Map<int, String> filterFutureAllOptions = {
+    1: 'Tất cả',
+    2: 'USDC',
+    3: 'AI',
+    4: 'RWA',
+    5: 'Layer-1',
+    6: 'Layer-2',
+    7: 'Gaming',
+    8: 'Meme',
+    9: 'Cơ sở hạ tầng',
+    10: 'DeFi',
+    11: 'Metaverse',
+    12: 'Thanh toán',
+    13: 'PoW',
+    14: 'Lưu trữ',
+    15: 'NFT',
+    16: 'Index'
+  };
 }

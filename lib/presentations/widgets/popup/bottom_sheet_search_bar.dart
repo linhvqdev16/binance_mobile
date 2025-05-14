@@ -7,7 +7,7 @@ class SearchBarBottom extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 38,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
