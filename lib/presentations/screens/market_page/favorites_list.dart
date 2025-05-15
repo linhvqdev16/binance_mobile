@@ -261,16 +261,16 @@ class _FavoritesListState extends ConsumerState<FavoritesList>
             : (price < prevPrice ? const Color(0xFFF6465D) : Colors.black);
 
         return GestureDetector(
-          onTap: (){
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => CoinDetailScreen(symbol: symbol)),
-            );
+          onTap: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) => CoinDetailScreen(symbol: symbol)),
+            // );
           },
           child: Container(
-            padding:
-                const EdgeInsets.only(left: 16.0, right: 10, top: 12, bottom: 12),
+            padding: const EdgeInsets.only(
+                left: 16.0, right: 10, top: 12, bottom: 12),
             decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
             ),

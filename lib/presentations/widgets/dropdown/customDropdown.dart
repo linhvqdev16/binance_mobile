@@ -19,21 +19,10 @@ class CustomDropdownButtonFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     final getWidth = MediaQuery.of(context).size.width;
 
-    return Container(
-      margin: const EdgeInsets.all(6),
-      width: 0.95 * getWidth,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey, width: 0.9),
-        borderRadius: BorderRadius.circular(25),
-      ),
+    return SizedBox(
+      width: 0.15 * getWidth,
       child: DropdownButtonFormField2<String>(
-        value: listItems.contains(value) ? value : null, // Giá trị được chọn
-        hint: Text(
-          hintText, // Văn bản gợi ý
-          style: const TextStyle(
-              fontSize: 15, color: Colors.grey, fontWeight: FontWeight.w500),
-        ),
+        value: listItems.contains(value) ? value : null,
         iconStyleData: const IconStyleData(
           icon: Icon(
             Icons.arrow_drop_down,
@@ -43,25 +32,20 @@ class CustomDropdownButtonFormField extends StatelessWidget {
         isExpanded: true,
         items: listItems.map((item) => buildMenuItem(item)).toList(),
         onChanged: (newValue) {
-          onChanged(newValue); // Gọi hàm onChanged khi giá trị thay đổi
+          onChanged(newValue);
         },
         decoration: const InputDecoration(
           border: InputBorder.none,
-          prefixIcon: Icon(
-            Icons.school,
-            color: Color(0xFF245D7C),
-          ),
           contentPadding: EdgeInsets.symmetric(vertical: 10),
         ),
         dropdownStyleData: DropdownStyleData(
-          maxHeight: 200,
-          width: getWidth * 0.7,
-          padding: const EdgeInsets.all(8),
-          scrollPadding: const EdgeInsets.symmetric(vertical: 8),
+          // maxHeight: 200,
+          width: getWidth * 0.32,
+          scrollPadding: const EdgeInsets.symmetric(vertical: 3),
           elevation: 10,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
@@ -92,9 +76,9 @@ class CustomDropdownButtonFormField extends StatelessWidget {
       child: Text(
         item,
         style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: isSelected ? const Color(0xff00008b) : Colors.black),
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w500 : FontWeight.w100,
+            color: isSelected ? Colors.black : Colors.grey),
       ),
     );
   }

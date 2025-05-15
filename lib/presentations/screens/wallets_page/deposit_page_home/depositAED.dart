@@ -147,69 +147,79 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                   const SizedBox(height: 16),
 
                   // Search bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: Colors.grey.shade500,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Tìm',
-                                hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                    fontFamily: 'Roboto',
-                                    fontWeight: FontWeight.bold),
-                                border: InputBorder.none,
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 10),
-                              ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search,
+                                  color: Colors.grey.shade500,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                const Expanded(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Tìm',
+                                      hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold),
+                                      border: InputBorder.none,
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 5),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              'Huỷ bỏ',
-                              style: TextStyle(
-                                  color: Colors.amber,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Roboto',
-                                  fontSize: 14),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      SizedBox(
+                        width: 80,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            'Huỷ bỏ',
+                            style: TextStyle(
+                                color: Colors.amber,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Roboto',
+                                fontSize: 15),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 16),
 
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       'Tất cả tiền mã hóa',
                       style: TextStyle(
                           fontSize: 16,
+                          color: Colors.grey[500],
                           fontWeight: FontWeight.w500,
                           fontFamily: 'Roboto'),
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
 
                   // List of cryptocurrencies
                   Expanded(
@@ -576,11 +586,9 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
               _buildBuySellWidget(screenSize),
               SizedBox(height: screenSize.height * 0.015),
               _buildPriceChange(screenSize),
-              SizedBox(height: screenSize.height * 0.015),
+              SizedBox(height: screenSize.height * 0.1),
               _buildBuyCoin(screenSize),
-              SizedBox(height: screenSize.height * 0.015),
               _buildPayment(screenSize),
-              SizedBox(height: screenSize.height * 0.01),
               _buildAmountButtons(screenSize),
               buildNumberRow(['1', '2', '3']),
               buildNumberRow(['4', '5', '6']),
@@ -695,7 +703,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
             child: Row(
               children: [
                 Text(
-                  amount,
+                  amount.isEmpty ? '0' : amount,
                   style: TextStyle(
                       fontSize: 60,
                       fontWeight: FontWeight.w300,
@@ -703,8 +711,6 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                 ),
                 const SizedBox(width: 10),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -746,15 +752,9 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
 
   //Mua tiền mã hóa
   Widget _buildBuyCoin(Size screenSize) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.03),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.shade300),
-          ),
-        ),
-        child: ListTile(
+    return Column(
+      children: [
+        ListTile(
           leading: Image.asset(
             'assets/images/ustd.png',
             width: 28,
@@ -786,40 +786,38 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
           ),
           onTap: _showCryptoListBottomSheet,
         ),
-      ),
+        const Divider(
+          color: Colors.grey,
+          thickness: 0.3,
+          indent: 15,
+          endIndent: 15,
+        )
+      ],
     );
   }
 
   //Thanh toán
   Widget _buildPayment(Size screenSize) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 15),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade300),
-        ),
+    return ListTile(
+      onTap: _showPaymentMethod,
+      leading: const Icon(Icons.account_balance, color: Colors.black),
+      title: const Text(
+        'Thanh toán bằng',
+        style:
+            TextStyle(color: Colors.grey, fontSize: 14, fontFamily: 'Roboto'),
       ),
-      child: ListTile(
-        onTap: _showPaymentMethod,
-        leading: const Icon(Icons.account_balance, color: Colors.black),
-        title: const Text(
-          'Thanh toán bằng',
-          style:
-              TextStyle(color: Colors.grey, fontSize: 14, fontFamily: 'Roboto'),
-        ),
-        subtitle: const Text(
-          'Chuyển khoản ngân hàng',
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Colors.black,
-              fontFamily: 'Roboto'),
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: Colors.grey[400],
-          size: 20,
-        ),
+      subtitle: const Text(
+        'Chuyển khoản ngân hàng',
+        style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+            fontFamily: 'Roboto'),
+      ),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: Colors.grey[400],
+        size: 20,
       ),
     );
   }
@@ -827,7 +825,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
   //Quick amount buttons
   Widget _buildAmountButtons(Size screenSize) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       child: Column(
         children: [
           // Quick amount buttons row
@@ -848,7 +846,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
-                    child: const Text('70 đ',
+                    child: const Text('Tối thiểu',
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
@@ -868,7 +866,7 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
-                    child: const Text('200 đ',
+                    child: const Text('200 د.إ',
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
@@ -902,29 +900,24 @@ class _DepositAEDPageState extends ConsumerState<DepositAEDPage> {
 
   // Numeric Keypad Widget
   Widget buildNumberRow(List<String> numbers) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: numbers.map((number) {
-          if (number == 'backspace') {
-            return NumberKey(
-              child: const Icon(Icons.backspace),
-              onTap: () => removeDigit(),
-            );
-          }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: numbers.map((number) {
+        if (number == 'backspace') {
           return NumberKey(
-            child: Text(
-              number,
-              style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500),
-            ),
-            onTap: () => addDigit(number),
+            child: const Icon(Icons.backspace),
+            onTap: () => removeDigit(),
           );
-        }).toList(),
-      ),
+        }
+        return NumberKey(
+          child: Text(
+            number,
+            style: const TextStyle(
+                fontSize: 24, color: Colors.black, fontWeight: FontWeight.w700),
+          ),
+          onTap: () => addDigit(number),
+        );
+      }).toList(),
     );
   }
 }
@@ -945,8 +938,8 @@ class NumberKey extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(40),
       child: Container(
-        width: 60,
-        height: 60,
+        width: 50,
+        height: 50,
         alignment: Alignment.center,
         child: child,
       ),

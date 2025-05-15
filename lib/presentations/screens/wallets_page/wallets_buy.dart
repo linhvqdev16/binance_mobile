@@ -141,9 +141,9 @@ class _WalletsBuyState extends State<WalletsBuy> {
                   child: Text(
                     amount.isEmpty ? 'Hãy nhập số lượng' : amount,
                     style: TextStyle(
-                      fontSize: 15,
-                      color: amount.isEmpty ? Colors.grey : Colors.black,
-                    ),
+                        fontSize: 17,
+                        color: amount.isEmpty ? Colors.grey : Colors.black,
+                        fontFamily: 'Roboto'),
                   ),
                 ),
                 Row(
@@ -195,29 +195,24 @@ class _WalletsBuyState extends State<WalletsBuy> {
 
   // Number pad
   Widget buildNumberRow(List<String> numbers) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: numbers.map((number) {
-          if (number == 'backspace') {
-            return NumberKey(
-              child: const Icon(Icons.backspace),
-              onTap: () => removeDigit(),
-            );
-          }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: numbers.map((number) {
+        if (number == 'backspace') {
           return NumberKey(
-            child: Text(
-              number,
-              style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500),
-            ),
-            onTap: () => addDigit(number),
+            child: const Icon(Icons.backspace),
+            onTap: () => removeDigit(),
           );
-        }).toList(),
-      ),
+        }
+        return NumberKey(
+          child: Text(
+            number,
+            style: const TextStyle(
+                fontSize: 24, color: Colors.black, fontWeight: FontWeight.w700),
+          ),
+          onTap: () => addDigit(number),
+        );
+      }).toList(),
     );
   }
 

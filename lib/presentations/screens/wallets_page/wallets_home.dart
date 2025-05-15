@@ -1,5 +1,6 @@
 import 'package:binance_mobile/presentations/screens/wallets_page/deposit_page_home/deposit_page_home.dart';
 import 'package:binance_mobile/presentations/screens/wallets_page/wallets_buy.dart';
+import 'package:binance_mobile/presentations/widgets/dropdown/customDropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -98,26 +99,16 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 40,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.w400),
               ),
               const SizedBox(width: 12),
               Column(
                 children: [
                   const SizedBox(height: 10),
-                  DropdownButton<String>(
+                  CustomDropdownButtonFormField(
                     value: selectedCurrency,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    iconEnabledColor: Colors.grey[500],
-                    items: currencies.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    listItems: currencies,
+                    hintText: 'Chọn loại tiền',
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedCurrency = newValue!;
@@ -144,7 +135,7 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xfffad65f),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 elevation: 0,
@@ -152,8 +143,8 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
               child: const Text(
                 'Nạp tiền',
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
               ),
@@ -177,7 +168,7 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
       width: screenSize.width,
       height: screenSize.height * 0.15,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.grey[300]!),
       ),
       child: Padding(
@@ -264,8 +255,8 @@ class _WalletsHomeState extends ConsumerState<WalletsHome>
                         'Mua ngay',
                         style: TextStyle(
                           color: Color(0xfffad65f),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
